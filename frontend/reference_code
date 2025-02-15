@@ -1,0 +1,197 @@
+const express = require("express");
+const axios = require("axios");
+const cron = require("node-cron");
+const mongoose = require("mongoose");
+
+// MongoDB model for storing job postings
+const Job = mongoose.model(
+  "Job",
+  new mongoose.Schema({
+    company: String,
+    title: String,
+    location: String,
+    link: String,
+    job_posted: Date,
+    description: String,
+    category: String,
+    source: String,
+  })
+);
+
+const app = express();
+const PORT = import.meta.env.PORT || 5000;
+
+// MongoDB connection (replace with your connection string)
+mongoose.connect("mongodb://localhost:27017/jobs", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+// Rate limit settings
+const MAX_REQUESTS_PER_MINUTE = 25; // Adzuna API limit
+const MAX_DAILY_REQUESTS = 250; // Daily limit
+const MAX_MONTHLY_REQUESTS = 2500; // Monthly limit
+const MAX_JOBS_TO_FETCH = 50; // Maximum number of documents to fetch
+
+let requestCountToday = 0; // Track daily request count
+let requestCountThisMinute = 0; // Track requests made in the current minute
+let requestCountThisMonth = 0; // Track monthly request count
+let lastRequestTime = Date.now(); // Track the last request time
+
+// Variables to track pagination
+let currentPage = 1; // Track the current page for fetching jobs
+
+// Function to check if we need to wait before making a new request
+async function checkRateLimit() {
+  const now = Date.now();
+
+  // Reset minute counter every minute
+  if (now - lastRequestTime > 60000) {
+    requestCountThisMinute = 0;
+    lastRequestTime = now;
+  }
+
+  // Check if we've hit the per-minute limit
+  if (requestCountThisMinute >= MAX_REQUESTS_PER_MINUTE) {
+    const waitTime = Math.max(0, 60000 - (now - lastRequestTime)); // Time to wait until a minute has passed
+    console.log(`Rate limit reached. Waiting for ${waitTime / 1000} seconds.`);
+    await new Promise((resolve) => setTimeout(resolve, waitTime));
+  }
+}
+
+// Function to fetch job data from Adzuna API
+async function fetchDataFromAdzuna() {
+  const APP_id = "a4f5ad31"; // Replace with your actual APP ID
+  const APP_key = "34579444c00900f8fa58b004dc308aff"; // Replace with your actual APP key
+  const what = "data science";
+  const where = "us";
+
+  // First, get the total job count
+  const initialUrl = `https://api.adzuna.com/v1/api/jobs/us/search/1?app_id=${APP_id}&app_key=${APP_key}&what=${what}&where=${where}&results_per_page=1`;
+
+  try {
+    const initialResponse = await axios.get(initialUrl);
+    if (initialResponse.status !== 200) {
+      console.error(
+        `Error fetching initial data from Adzuna API: ${initialResponse.status} - ${initialResponse.statusText}`
+      );
+      return 0; // Exit if there's an error
+    }
+
+    const totalJobs = initialResponse.data.count; // Get total job count from response
+    console.log(`Total jobs available: ${totalJobs}`);
+
+    let totalJobsFetched = 0;
+    currentPage = 1; // Reset current page for fetching jobs
+
+    while (totalJobsFetched < Math.min(totalJobs, MAX_JOBS_TO_FETCH)) {
+      await checkRateLimit(); // Check and wait if necessary
+
+      const adzuna_url = `https://api.adzuna.com/v1/api/jobs/us/search/${currentPage}?app_id=${APP_id}&app_key=${APP_key}&what=${what}&where=${where}&results_per_page=50`;
+
+      try {
+        const response = await axios.get(adzuna_url);
+        if (response.status !== 200) {
+          console.error(
+            `Error fetching data from Adzuna API: ${response.status} - ${response.statusText}`
+          );
+          break; // Exit the loop if there's an error
+        }
+
+        const results = response.data.results;
+        if (results.length === 0) {
+          console.log("No more jobs to fetch.");
+          break; // Exit if no more jobs are returned
+        }
+
+        // Save each job posting to MongoDB up to the maximum limit
+        for (const result of results) {
+          if (totalJobsFetched >= Math.min(totalJobs, MAX_JOBS_TO_FETCH)) break; // Stop if we've fetched enough jobs
+
+          const jobData = {
+            company: result.company.display_name,
+            title: result.title,
+            location: result.location.display_name,
+            link: result.redirect_url,
+            job_posted: new Date(result.created),
+            description: result.description,
+            category: result.category.label,
+            source: "Adzuna",
+          };
+
+          // Save to database
+          await Job.create(jobData);
+          totalJobsFetched++; // Increment total jobs fetched
+
+          requestCountToday++; // Increment today's request count
+          requestCountThisMinute++; // Increment this minute's request count
+          requestCountThisMonth++; // Increment this month's request count
+
+          console.log(`Saved job: ${result.title}`);
+        }
+
+        console.log(
+          `Fetched and saved ${results.length} jobs from page ${currentPage}.`
+        );
+        currentPage++; // Move to the next page
+      } catch (error) {
+        console.error(`Error fetching data from Adzuna API: ${error.message}`);
+        break; // Exit the loop on error
+      }
+
+      // Check daily and monthly limits after each page fetch
+      if (requestCountToday >= MAX_DAILY_REQUESTS) {
+        console.log(
+          "Daily request limit reached. Stopping further requests for today."
+        );
+        break;
+      }
+
+      if (requestCountThisMonth >= MAX_MONTHLY_REQUESTS) {
+        console.log(
+          "Monthly request limit reached. No further requests will be made this month."
+        );
+        return totalJobsFetched; // Exit without rescheduling for this month
+      }
+    }
+
+    return totalJobsFetched; // Return total number of jobs fetched
+  } catch (error) {
+    console.error(
+      `Error fetching initial data from Adzuna API: ${error.message}`
+    );
+    return 0; // Return 0 on error
+  }
+}
+
+// Schedule the cron job to run on the first day of every month at midnight
+cron.schedule("0 0 1 * *", async () => {
+  console.log("Running cron job to fetch jobs from Adzuna...");
+
+  const jobsFetched = await fetchDataFromAdzuna();
+
+  if (jobsFetched > 0) {
+    console.log(`Successfully fetched a total of ${jobsFetched} jobs.`);
+  } else {
+    console.log("No jobs fetched or an error occurred.");
+
+    // If monthly limit is reached, do not reschedule.
+    if (requestCountThisMonth < MAX_MONTHLY_REQUESTS) {
+      console.log("Rescheduling next fetch attempt...");
+
+      setTimeout(async () => {
+        console.log("Retrying to fetch jobs...");
+        await fetchDataFromAdzuna();
+      }, 3600000); // Retry after 1 hour (3600000 milliseconds)
+    } else {
+      console.log(
+        "Monthly limit reached. No further attempts will be made this month."
+      );
+    }
+  }
+});
+
+// Start the Express server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
