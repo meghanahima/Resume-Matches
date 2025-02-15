@@ -1,0 +1,19 @@
+The jobs are first passed through the aggregation pipeline and then some fields are being added which are 
+matchingSkills 
+processedSkills
+skillMatchScore
+
+from AI, the fields being coming are 
+finalMatchScore
+matchDetails: {
+    aiMatchScore
+    jobSkills
+    matchingSkills
+    skillMatchScore
+}
+skillMatchScore
+matchingSkills,
+matchReason
+processedSkills,
+
+4: {_id: ObjectId, jobId: 2896010000000000, jobTitle: 'Front-End Developer', role: 'UI/UX Developer', jobPortal: 'Internships.com', …}
