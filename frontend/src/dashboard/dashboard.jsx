@@ -96,7 +96,7 @@ const Dashboard = ({ isLoggedIn, onLogin }) => {
           </animated.div>
         </div>
 
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="my-20 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white rounded-2xl shadow-lg p-8 transform hover:scale-105 transition-all">
             <div className="text-3xl mb-4">📄</div>
             <h3 className="text-xl font-medium mb-2">Smart Resume Analysis</h3>

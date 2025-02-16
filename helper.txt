@@ -1,0 +1,107 @@
+{
+  "_id": {
+    "$oid": "67b198ef4629bd3c3e94d2e7"
+  },
+  "userId": {
+    "$oid": "67b0ea96269d0e9a49e76fee"
+  },
+  "url": "https://resumeinfos.blob.core.windows.net/resumes/549215_1739692268286_HimaMeghanaSiddiResume.pdf.pdf",
+  "title": "fresher_2024",
+  "ATSScore": 65,
+  "createdAt": {
+    "$date": "2025-02-16T07:51:11.754Z"
+  },
+  "updatedAt": {
+    "$date": "2025-02-16T07:51:21.501Z"
+  },
+  "__v": 0,
+  "analysis": {
+    "strengths": [
+      "Strong technical skills in various frontend and backend technologies (React, Node.js, Express.js, MongoDB)",
+      "Demonstrated project experience with real-world applications",
+      "Good academic record",
+      "Highlights achievements like coding contest participation and poster presentation wins",
+      "Clearly communicates skills and experience"
+    ],
+    "weaknesses": [
+      "Resume formatting inconsistencies (extra spaces, inconsistent date formats)",
+      "Experience section is very brief and lacks quantifiable achievements. The description of responsibilities is vague.",
+      "The 'Present' date for the Spotmies role needs clarification. Is this a current internship or full-time role?",
+      "The summary could be more concise and impactful, focusing on key skills and career goals.",
+      "LinkedIn profile URL is incomplete. It should include the full URL.",
+      "Skills section could be categorized for better readability (e.g., Frontend, Backend, Databases, etc.)",
+      "Projects section lacks detail on the impact and scale of each project. Quantifiable results would significantly strengthen this section.",
+      "Strengths section is too generic and lacks specific examples. Instead of stating 'communication skills', provide a specific example of how these skills were used effectively."
+    ],
+    "suggestions": [
+      "Improve resume formatting for better readability and professionalism.",
+      "Expand on the experience section with quantifiable achievements (e.g., 'Improved website load time by 20%', 'Reduced bug reports by 15%').",
+      "Clarify the duration of the Spotmies role.",
+      "Rewrite the summary to be more concise and impactful, highlighting key skills and career aspirations.",
+      "Complete the LinkedIn profile URL.",
+      "Categorize the skills section for better organization.",
+      "Add more details to the projects section, including quantifiable results and challenges overcome.",
+      "Provide specific examples in the strengths section to support the claims made.",
+      "Consider adding a portfolio link to showcase projects.",
+      "Proofread carefully to eliminate typos and grammatical errors."
+    ]
+  },
+  "content": "\n\n / \nHima Meghana Siddi\nPassionate Front-end Web developer\n9032873217meghanasiddi02@gmail.comhttps://github.com/meghanahima\nhttps://www.linkedin.com/in/meghana\nsiddi/\nVisakhapatnam\nSUMMARY\nA proactive Computer Science student with a focus on impactful web \ndevelopment results. Proficient in C\u0000\u0000, Python with expertise in crafting \nresponsive, visually appealing web pages. Skilled in integrating frontend tools \nlike SwiperJS for enhanced user engagement and utilizing frameworks like \nBootstrap and Tailwind CSS for optimized performance. Known for clear \ncommunication, collaboration, and a diligent work ethic, committed to \ndelivering quality results.\nEDUCATION\nBachelor of Technology (CSE)\nGayatri Vidya Parishad College of Engineering\n08/2022 \u0000 Present \nGPA\n9.310\nIntermediate(MPC)                                                                 98.7%\nNarayana Junior College,Visakhapatnam\n2020 \u0000 03/2022 \nSecondary school of education                                           97.8%\nSri Chaitanya techno school\n06/2019 \u0000 04/2020 \nEXPERIENCE\nMern Stack Developer\nSpotmies\n06/2024 \u0000 Pr  esent Visakhapatnam\nRecognized as a top performer and proactive contributor in team \nmeetings, offering strategic insights for product enhancement.\nCoordinated tasks from React component design to database \nmanagement, overseeing the entire development lifecycle to \nensure alignment with project objectives.\nKEY ACHIEVEMENTS\nRunner up in AlgoChase coding contest\nSuccessfully tackled challenging questions demonstrating strong passion for \ncoding\nPoster Presentation\nSecured prize in an IEEE Poster Presentation competition\nCERTIFICATION\nOIB\u0000SIP internship\nBy Oasis Infobyte on Web development and designing\nProgramming in C and Python\nBy Hacker Rank\nSKILLS\nReact JSNode JSExpress JS\nHTMLCSSJava Script\nC\u0000\u0000PythonProblem solving\nGit \u0000Version control system)\nPROJECTS\nAI interviewer - Reaidy.io\nSkills\u0000 Node Js, Express Js, MongoDB, Postman\nImplemented schema and API's for notifications \nfeature, transactions feature, various kinds of \nmetrics like users, revenue, credits system,..\nImproved authorization by generating and \nmanaging JWT tokens for secure user sessions.\nDeployed test servers on platforms like Railway \nand performed API testing using Postman.\nFinancial Assessment Website - \nAwaken\nSkills\u0000 React Js, JavaScript, MobX, Tailwind CSS, \nPostman\nDeveloped user friendly UI's and forms with \ndynamic form fields and graphical \nrepresentations (pie and bar charts) based on \nuser inputs.\nLeveraged MobX for state management \nensuring reactivity across components.\nUtilized various npm packages for report \ngeneration, conditional validation of input fields.\nIntegrated APIs for data handling.\nGPT-3 Dashboard\nSkills\u0000 React Js, CSS, JavaScript, npm packages\nDeveloped a responsive GPT\u00003 dashboard UI \nusing flexible and grid layouts, enhancing user \nexperience with various gradient designs.\nUtilized reusable components for efficient \ndevelopment and maintenance.\nSTRENGTHS\nCommunication Skills\nDeveloped effective communication skills  fostering \nclarity, empathy, and teamwork\nLeadership\nDemonstrated leadership through effective \ncommunication, decision-making, and motivating \npeers, fostering a collaborative and goal-oriented \nenvironment\nEq\nq\n•\n•\n•\n•\n•\n•\n•\n•\n•\n•\n•",
+  "parsedInfo": {
+    "contact_info": {
+      "name": "Hima Meghana Siddi",
+      "email": "meghanasiddi02@gmail.com",
+      "phone": "9032873217",
+      "location": "Visakhapatnam",
+      "linkedin": "https://www.linkedin.com/in/meghana"
+    },
+    "summary": "A proactive Computer Science student with a focus on impactful web development results. Proficient in C++, Python with expertise in crafting responsive, visually appealing web pages. Skilled in integrating frontend tools like SwiperJS for enhanced user engagement and utilizing frameworks like Bootstrap and Tailwind CSS for optimized performance. Known for clear communication, collaboration, and a diligent work ethic, committed to delivering quality results.",
+    "skills": [
+      "React JS",
+      "Node JS",
+      "Express JS",
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "C++",
+      "Python",
+      "Problem solving",
+      "Git",
+      "MongoDB",
+      "Postman",
+      "SwiperJS",
+      "Bootstrap",
+      "Tailwind CSS",
+      "MobX",
+      "JWT"
+    ],
+    "experience": [
+      {
+        "title": "Mern Stack Developer",
+        "company": "Spotmies",
+        "duration": "06/2024 - Present",
+        "responsibilities": [
+          "Recognized as a top performer and proactive contributor in team meetings, offering strategic insights for product enhancement.",
+          "Coordinated tasks from React component design to database management, overseeing the entire development lifecycle to ensure alignment with project objectives."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor of Technology (CSE)",
+        "institution": "Gayatri Vidya Parishad College of Engineering",
+        "year": "08/2022 - Present"
+      },
+      {
+        "degree": "Intermediate(MPC)",
+        "institution": "Narayana Junior College, Visakhapatnam",
+        "year": "2020 - 03/2022"
+      },
+      {
+        "degree": "Secondary school of education",
+        "institution": "Sri Chaitanya techno school",
+        "year": "06/2019 - 04/2020"
+      }
+    ]
+  }
+}

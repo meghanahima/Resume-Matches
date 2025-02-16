@@ -19,42 +19,113 @@ router.post("/save-resume", protect, async (req, res) => {
     const extractedContent = await FileProcessingService.extractText(file);
 
     // Call Gemini API to parse resume
-    const prompt = `Analyze this resume and provide a detailed response in JSON format with the following structure:
+    const prompt = `Analyze this resume and extract key details into a structured JSON format.  
+Ensure the response is within a **1000-token limit** by prioritizing the most relevant details and avoiding redundancy. **Extract all skills** and remove duplicates.  
+
+Return the response in the following **valid JSON format**:  
 
 {
   "parsedInfo": {
     "contact_info": {
-      "name": string | null,
-      "email": string | null,
-      "phone": string | null,
-      "location": string | null,
-      "linkedin": string | null
+      "name": string | null,           // Extract full name  
+      "email": string | null,          // Extract email  
+      "phone": string | null,          // Extract phone number  
+      "location": string | null,       // Extract city or full address if available  
+      "linkedin": string | null,       // Extract LinkedIn profile link  
+      "portfolio": string | null       // Extract GitHub or portfolio link  
     },
-    "summary": string | null,
-    "skills": string[],
-    "experience": [{
-      "title": string,
-      "company": string,
-      "duration": string,
-      "responsibilities": string[]
-    }],
-    "education": [{
-      "degree": string,
-      "institution": string,
-      "year": string
-    }]
+    "summary": string | null,           // Extract a concise professional summary  
+    "skills": [                          // Extract all unique skills  
+      {
+        "skill": string | null,         // Skill name  
+        "level": string | null          // Proficiency level (if available)  
+      }
+    ],
+    "languages": [                       // Extract spoken & programming languages  
+      {
+        "language": string | null,  
+        "level": string | null  
+      }
+    ],
+    "employmentHistory": [               // Extract most **relevant** jobs (max 3)  
+      {
+        "jobTitle": string | null,  
+        "company": string | null,  
+        "city": string | null,  
+        "startDate": string | null,     // Format: MM/YYYY or YYYY  
+        "endDate": string | null,       // "Present" if ongoing  
+        "description": string | null,  
+        "presentWorking": boolean | null // True if currently employed  
+      }
+    ],
+    "internships": [                     // Extract relevant internships (max 2)  
+      {
+        "jobTitle": string | null,  
+        "employer": string | null,  
+        "startDate": string | null,  
+        "endDate": string | null,  
+        "city": string | null,  
+        "description": string | null  
+      }
+    ],
+    "projects": [                        // Extract key projects (max 3)  
+      {
+        "title": string | null,  
+        "techStackUsed": [string | null], // Technologies used  
+        "role": string | null,  
+        "description": string | null  
+      }
+    ],
+    "education": [                        // Extract **highest** education  
+      {
+        "degree": string | null,  
+        "institution": string | null,  
+        "year": string | null  
+      }
+    ],
+    "courses": [                          // Extract key courses (if available)  
+      {
+        "course": string | null,  
+        "institution": string | null,  
+        "startDate": string | null,  
+        "endDate": string | null  
+      }
+    ],
+    "achievements": [                     // Extract top achievements (max 3)  
+      {
+        "title": string | null,  
+        "date": string | null,  
+        "description": string | null,  
+        "issuer": string | null  
+      }
+    ]
   },
-  "analysis": {
-    "strengths": string[],
-    "weaknesses": string[],
-    "suggestions": string[],
+  "analysis": {                           // Provide insights on the candidate  
+    "strengths": string[],                // Max **3 key strengths**  
+    "weaknesses": string[],               // Max **3 areas for improvement**  
+    "suggestions": string[]               // Max **5 actionable career suggestions**  
   }
 }
 
-Resume text to analyze:
+### **Guidelines for Extraction:**  
+- **Avoid redundancy** – Include only unique and relevant details.  
+- **Ensure valid JSON** – Do not include missing commas or incorrect formats.  
+- **Use concise, clear descriptions** – Keep summaries short and impactful.  
+- **Extract all skills** while avoiding duplication.  
+- **Ensure consistency** – Maintain proper date formats (MM/YYYY or YYYY).  
+
+### **Resume text to analyze:**  
 ${extractedContent}
 
-Provide constructive feedback focusing on professional development.`;
+### **Analysis Instructions:**  
+- Provide **constructive feedback** focusing on **career improvement**.  
+- Limit analysis to a **maximum of**:  
+  - **3 strengths** – Highlight key professional advantages.  
+  - **3 weaknesses** – Identify areas for development.  
+  - **5 career suggestions** – Offer specific recommendations.  
+- Make feedback **actionable** and **tailored to the resume content**.  
+`
+
 
     const geminiResponse = await axios.post(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
@@ -68,7 +139,7 @@ Provide constructive feedback focusing on professional development.`;
           temperature: 0.1, // Reduced for more consistent output
           topP: 1,
           topK: 1,
-          maxOutputTokens: 1000,
+          maxOutputTokens: 3000,
         },
       },
       {
@@ -120,10 +191,10 @@ Provide constructive feedback focusing on professional development.`;
     //   { new: true }
     // );
 
-    const { content, ...resumeWithoutContent } = savedResume;
+    // const { content, ...resumeWithoutContent } = savedResume;
     res.status(201).json({
       success: true,
-      resume: resumeWithoutContent,
+      resume: resume,
     });
   } catch (error) {
     console.error("Error processing resume:", error);

@@ -533,7 +533,6 @@ const FindJobs = ({ showToast }) => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("skdj", data, data?.resume);
         const resumeFileToBeSet = {
           ...data?.resume,
           dbSavedResume: true,

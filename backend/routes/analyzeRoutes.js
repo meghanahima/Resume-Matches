@@ -309,17 +309,15 @@ router.post("/get-jobs/:id", async (req, res) => {
     if (!analyzedJobs) {
       // If not in cache, do the full analysis
       const resume = await Resume.findById(resumeId);
-      if (!resume || !resume.analysis) {
+      if (!resume || !resume.parsedInfo) {
         return res
           .status(404)
-          .json({ message: "Resume or analysis not found" });
+          .json({ message: "Resume parsedInfo not found" });
       }
 
-      const resumeSkills = resume.analysis.skills
-        .map((skill) => normalizeSkill(skill))
+      const resumeSkills = resume.parsedInfo.skills
+        .map((skill) => normalizeSkill(skill.skill))
         .filter((skill) => skill.length > 0);
-
-      console.log(resumeSkills, "resumeSkills")
 
       // First get ALL potentially matching jobs
       const skillMatchedJobs = await JobDescription.aggregate([

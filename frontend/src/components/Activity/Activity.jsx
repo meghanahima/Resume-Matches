@@ -196,7 +196,7 @@ const ResumeCard = ({ resume, isExpanded, onToggle }) => {
                       key={index}
                       className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
                     >
-                      {skill}
+                      {skill.skill}
                     </span>
                   ))}
                 </div>

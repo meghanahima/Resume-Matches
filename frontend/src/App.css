@@ -40,3 +40,49 @@
 .read-the-docs {
   color: #888;
 }
+
+.page-break-before {
+  page-break-before: always; /* Force a page break before the element */
+}
+
+.page-break-after {
+  page-break-after: always;  /* Force a page break after the element */
+}
+
+.page-break-inside-avoid {
+  page-break-inside: avoid; /* Try to avoid breaking the element in the middle of a page */
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+input[type="range"]:hover {
+  opacity: 1;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
