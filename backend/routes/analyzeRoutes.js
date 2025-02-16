@@ -297,7 +297,7 @@ Return a JSON array with each object having this exact structure:
 //   }
 // });
 
-router.get("/analyze-resume/:id", async (req, res) => {
+router.post("/get-jobs/:id", async (req, res) => {
   try {
     const resumeId = req.params.id;
     const { page = 1, limit = 10 } = req.body;
@@ -305,7 +305,6 @@ router.get("/analyze-resume/:id", async (req, res) => {
 
     // Use cacheService methods instead of direct cache access
     let analyzedJobs = await cacheService.getAnalyzedJobs(resumeId);
-    console.log("analyzedJobs", analyzedJobs?.length || 0);
 
     if (!analyzedJobs) {
       // If not in cache, do the full analysis
@@ -319,6 +318,8 @@ router.get("/analyze-resume/:id", async (req, res) => {
       const resumeSkills = resume.analysis.skills
         .map((skill) => normalizeSkill(skill))
         .filter((skill) => skill.length > 0);
+
+      console.log(resumeSkills, "resumeSkills")
 
       // First get ALL potentially matching jobs
       const skillMatchedJobs = await JobDescription.aggregate([

@@ -16,57 +16,45 @@ router.post("/save-resume", protect, async (req, res) => {
 
     // Extract text content from the resume using FileProcessingService
     const file = await FileProcessingService.downloadFileFromUrl(body.url);
-    const content = await FileProcessingService.extractText(file);
+    const extractedContent = await FileProcessingService.extractText(file);
 
     // Call Gemini API to parse resume
-    const prompt = `Extract information from this resume and return a clean JSON object. Follow these rules strictly:
-1. Only return valid JSON, no markdown or explanations
-2. Omit any fields that are not found in the resume
-3. Use null for missing values within required objects
-4. Ensure all arrays are properly formatted, even if empty
-5. Use consistent formatting for dates and durations
+    const prompt = `Analyze this resume and provide a detailed response in JSON format with the following structure:
 
-Expected JSON structure:
 {
-  "contact_info": {
-    "name": string | null,
-    "email": string | null,
-    "phone": string | null,
-    "location": string | null,
-    "linkedin": string | null
-  },
-  "summary": string | null,
-  "skills": string[],
-  "experience": [
-    {
+  "parsedInfo": {
+    "contact_info": {
+      "name": string | null,
+      "email": string | null,
+      "phone": string | null,
+      "location": string | null,
+      "linkedin": string | null
+    },
+    "summary": string | null,
+    "skills": string[],
+    "experience": [{
       "title": string,
       "company": string,
       "duration": string,
       "responsibilities": string[]
-    }
-  ],
-  "education": [
-    {
+    }],
+    "education": [{
       "degree": string,
       "institution": string,
       "year": string
-    }
-  ],
-  "certifications": string[],
-  "projects": [
-    {
-      "name": string,
-      "description": string,
-      "technologies": string[]
-    }
-  ],
-  "achievements": string[]
+    }]
+  },
+  "analysis": {
+    "strengths": string[],
+    "weaknesses": string[],
+    "suggestions": string[],
+  }
 }
 
-Resume text to parse:
-${content}
+Resume text to analyze:
+${extractedContent}
 
-Return only the JSON object, no additional text or formatting.`;
+Provide constructive feedback focusing on professional development.`;
 
     const geminiResponse = await axios.post(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
@@ -120,9 +108,10 @@ Return only the JSON object, no additional text or formatting.`;
       throw new Error("Failed to parse resume content: " + error.message);
     }
 
-    resume.content = content;
-    resume.analysis = parsedContent;
-    await resume.save();
+    resume.content = extractedContent;
+    resume.parsedInfo = parsedContent.parsedInfo;
+    resume.analysis = parsedContent.analysis;
+    let savedResume = await resume.save();
 
     // Add resume to user's resumes array
     // await User.findByIdAndUpdate(
@@ -131,12 +120,10 @@ Return only the JSON object, no additional text or formatting.`;
     //   { new: true }
     // );
 
+    const { content, ...resumeWithoutContent } = savedResume;
     res.status(201).json({
       success: true,
-      resume: {
-        // ...resume,
-        parsedData: parsedContent,
-      },
+      resume: resumeWithoutContent,
     });
   } catch (error) {
     console.error("Error processing resume:", error);

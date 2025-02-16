@@ -19,39 +19,57 @@ const SaveResumeModal = ({ isOpen, onClose, onSave, isLoading }) => {
     <div className={modalOverlayStyle} onClick={onClose}>
       <animated.div
         style={modalAnimation}
-        className="bg-white rounded-xl p-6 w-full max-w-md mx-4"
+        className="bg-white rounded-xl p-6 w-full max-w-md mx-4 shadow-lg border border-gray-100"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-xl font-semibold mb-4">
-          Name Your Professional Story ✨
-        </h3>
-        <p className="text-gray-600 mb-4">
-          Give your resume a memorable title to help you track your job
-          applications
-        </p>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="e.g., Senior Developer 2024"
-          className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 mb-4"
-        />
-        <div className="flex justify-end space-x-3">
+        <div className="flex items-start gap-4 mb-5">
+          <div className="flex-shrink-0 w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
+            <span className="text-2xl">🎯</span>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Great Resume!
+            </h3>
+            <p className="text-sm text-gray-600">
+              Give your resume a memorable title
+            </p>
+          </div>
+        </div>
+
+        <div className="relative">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g., Senior Developer 2024"
+            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 
+                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                     placeholder-gray-400 transition-all duration-200"
+          />
+          <p className="absolute -bottom-6 left-0 text-xs text-gray-500">
+            This will help you track your applications
+          </p>
+        </div>
+
+        <div className="flex justify-end items-center gap-3 mt-10">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="px-4 py-2 text-gray-600 hover:text-gray-800
+                     font-medium transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={() => onSave(title)}
             disabled={!title.trim() || isLoading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
-                     disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg 
+                     hover:bg-blue-700 disabled:opacity-50 
+                     disabled:cursor-not-allowed transition-colors
+                     font-medium inline-flex items-center"
           >
             {isLoading ? (
               <>
-                <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"
                     cx="12"
@@ -66,7 +84,7 @@ const SaveResumeModal = ({ isOpen, onClose, onSave, isLoading }) => {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Saving...
+                <span>Saving...</span>
               </>
             ) : (
               "Save Resume"
@@ -271,14 +289,35 @@ const SavedResumesModal = ({
   ) : null;
 };
 
+const MatchScoreBadge = ({ score, label, colorClass }) => (
+  <div
+    className={`px-3 py-1 rounded-full ${colorClass} text-sm font-medium flex items-center gap-1`}
+  >
+    <span className="text-lg">⚡</span>
+    {score}% {label}
+  </div>
+);
+
+const JobSkillTag = ({ skill }) => (
+  <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium m-1">
+    {typeof skill === "string" ? skill.trim() : skill}
+  </span>
+);
+
 const FindJobs = ({ showToast }) => {
   const navigate = useNavigate();
   const [loadingStep, setLoadingStep] = useState(0);
   const [showJobs, setShowJobs] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [resumeFile, setResumeFile] = useState(() => {
-    const savedResume = localStorage.getItem("uploadedResume");
-    return savedResume ? savedResume : null;
+    try {
+      const savedResume = JSON.parse(localStorage.getItem("uploadedResume"));
+      console.log(savedResume);
+      return savedResume ? savedResume : null;
+    } catch (error) {
+      console.error("Error parsing saved resume:", error);
+      return null;
+    }
   });
   const fileInputRef = useRef(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -288,35 +327,13 @@ const FindJobs = ({ showToast }) => {
   const [loadingResumes, setLoadingResumes] = useState(false);
   const [savingResume, setSavingResume] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const [showConfirmSave, setShowConfirmSave] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-
-  // Mock job data
-  const jobs = [
-    {
-      id: 1,
-      role: "Senior Frontend Developer",
-      company: "TechCorp Inc.",
-      logo: "https://via.placeholder.com/50",
-      location: "San Francisco, CA",
-      salary: "$120,000 - $150,000",
-      description:
-        "We are seeking experienced React developers to join our team in Visakhapatnam. As a React developer, you will be responsible for developing user interface components and implementing them following well-known React workflows. You should have a strong understanding of React JS and its core principles. The ideal candidate should have 1000 to 2000 years of experience in React development and be able to work full-time from our office in Visakhapatnam. This is a workFromOffice role with 5 openings available. The annual salary package ranges from 7000 per day in USD. If you are a skilled React developer looking for a challenging opportunity, we would love to hear from you.",
-      match: 95,
-    },
-    {
-      id: 2,
-      role: "Backend Developer",
-      company: "Spotmies",
-      logo: "https://via.placeholder.com/50",
-      location: "Visakhapatnam, AP",
-      salary: "$10,000 - $50,000",
-      description:
-        "We're looking for an experienced Backend Developer with React expertise...",
-      match: 95,
-    },
-    // Add more mock jobs...
-  ];
+  const [jobs, setJobs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [savedJobs, setSavedJobs] = useState([]);
+  const [isSavingJob, setIsSavingJob] = useState(false);
 
   const fadeIn = useSpring({
     opacity: showJobs ? 1 : 0,
@@ -351,66 +368,130 @@ const FindJobs = ({ showToast }) => {
   };
 
   const handleFileUpload = async (file) => {
-    setResumeFile(file);
-    localStorage.setItem(
-      "uploadedResume",
-      JSON.stringify({
-        name: file.name,
-        file: file,
-      })
-    );
-    setShowConfirmSave(true);
+    const resumeData = {
+      name: file.name,
+      lastModified: file.lastModified,
+      size: file.size,
+      type: file.type,
+      file: file, // This won't be stored in localStorage but needed for upload
+    };
+
+    setResumeFile(resumeData);
+
+    // Store only serializable data
+    const storageData = {
+      name: file.name,
+      lastModified: file.lastModified,
+      size: file.size,
+      type: file.type,
+    };
+
+    localStorage.setItem("uploadedResume", JSON.stringify(storageData));
+    setShowSaveModal(true);
   };
 
   const handleResumeUpload = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setResumeFile({
-        name: file.name,
-        file: file,
-      });
-      localStorage.setItem(
-        "uploadedResume",
-        JSON.stringify({
-          name: file.name,
-          file: file,
-        })
-      );
-      setShowConfirmSave(true);
+      handleFileUpload(file);
     }
   };
 
   const handlePickResume = (resume) => {
-    setResumeFile({
+    const resumeData = {
       name: resume.title,
       url: resume.url,
-    });
-    localStorage.setItem(
-      "uploadedResume",
-      JSON.stringify({
-        name: resume.title,
-        url: resume.url,
-      })
-    );
+      dbSavedResume: true,
+      title: resume.title,
+      ATSScore: resume.ATSScore,
+      createdAt: resume.createdAt,
+      _id: resume._id,
+    };
+
+    setResumeFile(resumeData);
+    localStorage.setItem("uploadedResume", JSON.stringify(resumeData));
   };
 
   const startJobSearch = async () => {
-    if (isSearching) return; // Prevent multiple clicks
+    if (isSearching) return;
     setIsSearching(true);
     setLoadingStep(1);
 
     try {
-      // Simulate API call with delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setLoadingStep(2);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setLoadingStep(3);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!resumeFile?._id) {
+        showToast("Please save your resume first", "error");
+        return;
+      }
+
+      // Reset jobs when starting new search
+      setJobs([]);
+      setCurrentPage(1);
+      setHasMore(true);
+
+      let loadingInterval = setInterval(() => {
+        setLoadingStep((prev) => (prev < 3 ? prev + 1 : 1));
+      }, 1500);
+
+      const response = await fetch(
+        `${getCurrentHost()}/api/analyze/get-jobs/${resumeFile._id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ page: 1 }),
+        }
+      );
+
+      clearInterval(loadingInterval);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch jobs");
+      }
+
+      const data = await response.json();
+      setJobs(data.matches || []);
+      setHasMore(data.pagination?.hasMore || false);
       setShowJobs(true);
     } catch (error) {
-      showToast("Failed to fetch jobs", "error");
+      console.error("Error fetching jobs:", error);
+      showToast(error.message || "Failed to fetch jobs", "error");
     } finally {
       setIsSearching(false);
+      setLoadingStep(0);
+    }
+  };
+
+  const loadMoreJobs = async () => {
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
+
+    try {
+      const nextPage = currentPage + 1;
+      const response = await fetch(
+        `${getCurrentHost()}/api/analyze/get-jobs/${resumeFile._id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ page: nextPage }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch more jobs");
+      }
+
+      const data = await response.json();
+      setJobs((prevJobs) => [...prevJobs, ...(data.matches || [])]);
+      setHasMore(data.pagination?.hasMore || false);
+      setCurrentPage(nextPage);
+    } catch (error) {
+      console.error("Error fetching more jobs:", error);
+      showToast("Failed to load more jobs", "error");
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -449,7 +530,19 @@ const FindJobs = ({ showToast }) => {
         }
       );
 
+      const data = await response.json();
+
       if (response.ok) {
+        console.log("skdj", data, data?.resume);
+        const resumeFileToBeSet = {
+          ...data?.resume,
+          dbSavedResume: true,
+        };
+        setResumeFile(resumeFileToBeSet);
+        localStorage.setItem(
+          "uploadedResume",
+          JSON.stringify(resumeFileToBeSet)
+        );
         showToast("Resume saved successfully!");
         setShowSaveModal(false);
       } else {
@@ -497,6 +590,64 @@ const FindJobs = ({ showToast }) => {
     }
   };
 
+  const handleSaveJob = async (jobId) => {
+    if (!resumeFile?._id) {
+      showToast("Please login to save jobs", "error");
+      return;
+    }
+
+    setIsSavingJob(true);
+    try {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const response = await fetch(`${getCurrentHost()}/api/users/save-job`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userData.token}`,
+        },
+        body: JSON.stringify({ jobId }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        showToast("Job saved successfully!");
+        // Update local state of saved jobs
+        setSavedJobs(data.savedJobs);
+      } else {
+        showToast(data.message || "Failed to save job", "error");
+      }
+    } catch (error) {
+      console.error("Error saving job:", error);
+      showToast("Failed to save job", "error");
+    } finally {
+      setIsSavingJob(false);
+    }
+  };
+
+  const loadSavedJobs = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      if (!userData?.token) return;
+
+      const response = await fetch(`${getCurrentHost()}/api/users/saved-jobs`, {
+        headers: {
+          Authorization: `Bearer ${userData.token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSavedJobs(data.savedJobs.map((job) => job._id));
+      }
+    } catch (error) {
+      console.error("Error loading saved jobs:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadSavedJobs();
+  }, []);
+
   // Add CSS for custom scrollbar
   useEffect(() => {
     const style = document.createElement("style");
@@ -519,6 +670,17 @@ const FindJobs = ({ showToast }) => {
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, []);
+
+  // Add this helper function
+  const getSkillsArray = (skills) => {
+    if (Array.isArray(skills)) {
+      return skills;
+    }
+    if (typeof skills === "string") {
+      return skills.split(",");
+    }
+    return [];
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-12 px-4">
@@ -576,7 +738,9 @@ const FindJobs = ({ showToast }) => {
                         />
                       </svg>
                       <span className="text-lg font-medium text-gray-800">
-                        {resumeFile.name}
+                        {resumeFile.dbSavedResume
+                          ? resumeFile.title
+                          : resumeFile.name}
                       </span>
                     </div>
                     <button
@@ -666,66 +830,263 @@ const FindJobs = ({ showToast }) => {
         {/* Jobs List */}
         {showJobs && (
           <animated.div style={fadeIn}>
-            <h2 className="text-2xl font-bold text-blue-600 mb-6">
-              Job listings
-            </h2>
-            <div className="grid gap-6">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">
+                  Job Matches
+                </h2>
+                <p className="text-gray-600 mt-2">
+                  Found {jobs.length} matches based on your profile
+                </p>
+              </div>
+              {/* <div className="flex gap-4 items-center">
+                <select className="px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500">
+                  <option>Sort by Match Score</option>
+                  <option>Sort by Company</option>
+                  <option>Sort by Location</option>
+                </select>
+              </div> */}
+            </div>
+
+            <div className="grid gap-8">
               {jobs.map((job) => (
                 <div
-                  key={job.id}
-                  className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+                  key={job._id}
+                  className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all duration-200 border border-gray-100"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex gap-4">
-                      <img
-                        src={job.logo}
-                        alt={job.company}
-                        className="w-12 h-12 rounded-lg object-cover"
-                      />
-                      <div className="text-left">
-                        <h3 className="text-xl font-semibold text-gray-900">
-                          {job.role}
-                        </h3>
-                        <p className="text-gray-600 text-sm mt-1">
-                          {job.company}
-                        </p>
-                        <div className="flex gap-4 mt-2 text-sm text-gray-500">
-                          <span>{job.location}</span>
-                          <span>{job.salary}</span>
+                  <div className="flex flex-col gap-6">
+                    {/* Header Section */}
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-2xl">
+                            {job.company.charAt(0)}
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-semibold text-gray-900">
+                              {job.role}
+                            </h3>
+                            <div className="flex items-center gap-2 mt-1 text-gray-600">
+                              <span>{job.company}</span>
+                              <span>•</span>
+                              <span className="flex items-center gap-1">
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                  />
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                  />
+                                </svg>
+                                {job.companyProfile.City},{" "}
+                                {job.companyProfile.State}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <p className="mt-3 text-gray-600 text-sm max-w-2xl">
-                          {job.description}
-                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <MatchScoreBadge
+                          score={Math.round(job.finalMatchScore)}
+                          label="Match"
+                          colorClass="bg-green-50 text-green-700"
+                        />
+                        <MatchScoreBadge
+                          score={job.aiMatchScore}
+                          label="AI"
+                          colorClass="bg-blue-50 text-blue-700"
+                        />
                       </div>
                     </div>
-                    <div className="flex flex-col items-end">
-                      <div className="text-green-600 font-semibold text-lg">
-                        {job.match}% Match
+
+                    {/* Content Section */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-2">
+                          About the Role
+                        </h4>
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                          {job.jobDescription}
+                        </p>
                       </div>
-                      <button
-                        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg 
-                                 hover:bg-blue-700 transition-colors font-medium"
-                      >
-                        Apply Now
-                      </button>
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-2">
+                          Required Skills
+                        </h4>
+                        <div className="flex flex-wrap">
+                          {getSkillsArray(job.skills).map((skill, index) => (
+                            <JobSkillTag key={index} skill={skill} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer Section */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <div className="flex items-center gap-4">
+                        <span className="flex items-center gap-2 text-sm text-gray-500">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          Posted via {job.jobPortal}
+                        </span>
+                        <span className="text-sm text-gray-500">•</span>
+                        <a
+                          href={job.companyProfile.Website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:text-blue-700"
+                        >
+                          Visit Company Website
+                        </a>
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => handleSaveJob(job._id)}
+                          disabled={isSavingJob}
+                          className={`px-4 py-2 border rounded-lg transition-colors font-medium
+                            ${
+                              savedJobs.includes(job._id)
+                                ? "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+                                : "text-gray-700 border-gray-200 hover:bg-gray-50"
+                            }`}
+                        >
+                          {savedJobs.includes(job._id) ? (
+                            <span className="flex items-center gap-2">
+                              <svg
+                                className="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              Saved
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-2">
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                                />
+                              </svg>
+                              Save Job
+                            </span>
+                          )}
+                        </button>
+                        <button
+                          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                                         transition-colors font-medium flex items-center gap-2"
+                        >
+                          Apply Now
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 7l5 5m0 0l-5 5m5-5H6"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Enhanced Load More Button */}
+            {hasMore && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={loadMoreJobs}
+                  disabled={isLoadingMore}
+                  className="px-8 py-3 bg-white border border-gray-200 rounded-xl
+                           hover:bg-gray-50 transition-colors disabled:opacity-50
+                           text-gray-700 font-medium flex items-center gap-2 mx-auto"
+                >
+                  {isLoadingMore ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Loading more jobs...
+                    </>
+                  ) : (
+                    <>
+                      Show More Jobs
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </animated.div>
         )}
       </div>
 
       {/* Modals */}
-      <ConfirmSaveModal
-        isOpen={showConfirmSave}
-        onClose={() => setShowConfirmSave(false)}
-        onConfirm={() => {
-          setShowConfirmSave(false);
-          setShowSaveModal(true);
-        }}
-      />
       <SaveResumeModal
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}

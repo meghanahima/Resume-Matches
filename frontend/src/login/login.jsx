@@ -77,16 +77,14 @@ const Login = ({ isSignUp = false, showToast }) => {
 
           const data = await response.json();
 
-          if (response.status !== 201) {
-            showToast(data?.message || "Registration failed", "error");
-          } else {
-            localStorage.setItem(
-              "userData",
-              JSON.stringify({ ...data, gender: formData.gender })
+          if (response.status === 201) {
+            showToast(
+              data.message ||
+                "Registration successful. Please check your email to verify your account."
             );
-            localStorage.setItem("isLoggedIn", "true");
-            navigate("/");
-            showToast("Welcome! Your account has been created successfully");
+            navigate("/login");
+          } else {
+            showToast(data.message || "Registration failed", "error");
           }
         } else {
           const payload = {
@@ -334,6 +332,16 @@ const Login = ({ isSignUp = false, showToast }) => {
                                focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       placeholder="••••••••"
                     />
+                    {!isSignUp && (
+                      <div className="text-right mt-1">
+                        <Link
+                          to="/forgot-password"
+                          className="text-sm text-blue-600 hover:text-blue-700"
+                        >
+                          Forgot Password?
+                        </Link>
+                      </div>
+                    )}
                     {errors.password && (
                       <p className="text-red-500 text-sm mt-1">
                         {errors.password}

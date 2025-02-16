@@ -44,7 +44,19 @@ const userSchema = new mongoose.Schema({
   profilePic: {
     type: String,
     trim: true
-  }
+  },
+  isEmailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerificationToken: String,
+  emailVerificationExpires: Date,
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
+  savedJobs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'JobDescription'
+  }]
 }, {
   timestamps: true
 });

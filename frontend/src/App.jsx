@@ -14,6 +14,9 @@ import FindJobs from "./components/FindJobs/FindJobs";
 import Footer from "./components/Footer/Footer";
 import Toast from "./components/Toast/Toast";
 import Profile from "./components/Profile/Profile";
+import EmailVerification from "./components/EmailVerification/EmailVerification";
+import PasswordReset from "./components/PasswordReset/PasswordReset";
+import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -34,12 +37,33 @@ function App() {
               path="/signup"
               element={<Login isSignUp={true} showToast={showToast} />}
             />
-            <Route path="/find-jobs" element={<FindJobs showToast={showToast} />} />
+            <Route
+              path="/find-jobs"
+              element={<FindJobs showToast={showToast} />}
+            />
             <Route path="/resume-upload" element={<ResumeUpload />} />
             <Route path="/resume-builder" element={<ResumeBuilder />} />
-            <Route path="/your-activity" element={<Activity />} />
+            <Route
+              path="/your-activity"
+              element={<Activity showToast={showToast} />}
+            />
             <Route path="/" element={<Dashboard isLoggedIn={isLoggedIn} />} />
-            <Route path="/profile" element={<Profile showToast={showToast}/>} />
+            <Route
+              path="/profile"
+              element={<Profile showToast={showToast} />}
+            />
+            <Route
+              path="/verify-email/:token"
+              element={<EmailVerification showToast={showToast} />}
+            />
+            <Route
+              path="/reset-password/:token"
+              element={<PasswordReset showToast={showToast} />}
+            />
+            <Route
+              path="/forgot-password"
+              element={<ForgotPassword showToast={showToast} />}
+            />
           </Routes>
         </main>
         <Footer />

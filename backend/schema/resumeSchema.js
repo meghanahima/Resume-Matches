@@ -18,8 +18,12 @@ const resumeSchema = new mongoose.Schema({
   content: {
     type: String
   },
+  parsedInfo: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
   analysis: {
-    type: mongoose.Schema.Types.Mixed, // This allows for flexible data structure
+    type: mongoose.Schema.Types.Mixed,
     default: {}
   },
   ATSScore: {
