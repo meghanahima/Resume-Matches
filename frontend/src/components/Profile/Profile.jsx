@@ -82,10 +82,14 @@ const Profile = ({ showToast }) => {
 
       // If there's a new profile picture, upload it first
       if (updatedFields.profilePic instanceof File) {
-        const randomNumber = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+        const randomNumber =
+          Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
         const timestamp = Date.now().toString();
         const filename = `${randomNumber}_${timestamp}_${updatedFields.profilePic.name}`;
-        const fileUploaded = await uploadFileToAzure(filename, updatedFields.profilePic);
+        const fileUploaded = await uploadFileToAzure(
+          filename,
+          updatedFields.profilePic
+        );
         updatedFields.profilePic = fileUploaded.url;
       }
 

@@ -19,6 +19,22 @@ const ResumeCard = ({ resume, isExpanded, onToggle }) => {
   const navigate = useNavigate();
   const [showPdfPreview, setShowPdfPreview] = useState(false);
 
+  const handleFindJobs = () => {
+    // Store the selected resume in localStorage before navigating
+    const resumeData = {
+      name: resume.title,
+      url: resume.url,
+      dbSavedResume: true,
+      title: resume.title,
+      ATSScore: resume.ATSScore,
+      createdAt: resume.createdAt,
+      _id: resume._id
+    };
+    
+    localStorage.setItem("uploadedResume", JSON.stringify(resumeData));
+    navigate("/find-jobs");
+  };
+
   return (
     <>
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -310,7 +326,7 @@ const ResumeCard = ({ resume, isExpanded, onToggle }) => {
                   View Resume
                 </button> */}
                 <button
-                  onClick={() => navigate("/find-jobs")}
+                  onClick={handleFindJobs}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg
                            hover:bg-blue-700 transition-colors text-sm font-medium"
                 >
