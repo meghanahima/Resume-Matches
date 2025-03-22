@@ -55,7 +55,6 @@ const Login = ({ isSignUp = false, showToast }) => {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        console.log(isSignUp, "hello megh");
         if (isSignUp) {
           const payload = {
             name: formData.name,
@@ -65,7 +64,7 @@ const Login = ({ isSignUp = false, showToast }) => {
             gender: formData.gender,
             githubProfileUrl: formData?.github || "",
             linkedinProfileUrl: formData?.linkedin || "",
-            frontendURL: req.get("host"),
+            frontendURL: window.location.origin,
           };
 
           const response = await fetch(
@@ -129,6 +128,7 @@ const Login = ({ isSignUp = false, showToast }) => {
           }
         }
       } catch (error) {
+        console.log(error);
         showToast(
           isSignUp ? "Registration failed" : "Login failed. Please try again.",
           "error"
@@ -181,7 +181,7 @@ const Login = ({ isSignUp = false, showToast }) => {
                       </h3>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Full Name
+                          Full Name<span className="text-red-500"> *</span>
                         </label>
                         <input
                           type="text"
@@ -201,7 +201,7 @@ const Login = ({ isSignUp = false, showToast }) => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Phone Number
+                          Phone Number<span className="text-red-500"> *</span>
                         </label>
                         <input
                           type="tel"
@@ -318,7 +318,7 @@ const Login = ({ isSignUp = false, showToast }) => {
                   </h3>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email Address
+                      Email Address<span className="text-red-500"> *</span>
                     </label>
                     <input
                       type="email"
@@ -338,7 +338,7 @@ const Login = ({ isSignUp = false, showToast }) => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Password
+                      Password<span className="text-red-500"> *</span>
                     </label>
                     <input
                       type="password"
@@ -369,7 +369,7 @@ const Login = ({ isSignUp = false, showToast }) => {
                   {isSignUp && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Confirm Password
+                        Confirm Password<span className="text-red-500"> *</span>
                       </label>
                       <input
                         type="password"
