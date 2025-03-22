@@ -40,8 +40,8 @@ const sendVerificationEmail = async (frontendURL, email, token) => {
   return sendEmail(email, "Verify your email", html);
 };
 
-const sendPasswordResetEmail = async (email, token) => {
-  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+const sendPasswordResetEmail = async (email, token, frontendURL) => {
+  const resetUrl = `${frontendURL}/reset-password/${token}`;
   const html = `
     <h1>Password Reset Request</h1>
     <p>Please click this link to reset your password:</p>

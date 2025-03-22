@@ -138,7 +138,7 @@ router.get("/verify-email/:token", async (req, res) => {
 // Forgot Password
 router.post("/forgot-password", async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, frontendURL } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -154,7 +154,7 @@ router.post("/forgot-password", async (req, res) => {
     await user.save();
 
     // Send reset email
-    await sendPasswordResetEmail(email, resetToken);
+    await sendPasswordResetEmail(email, resetToken, frontendURL);
 
     res
       .status(200)

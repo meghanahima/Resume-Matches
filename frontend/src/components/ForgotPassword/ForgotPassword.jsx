@@ -18,12 +18,13 @@ const ForgotPassword = ({ showToast }) => {
     setIsLoading(true);
 
     try {
+      const currentRunningOrigin = window.location.origin;
       const response = await fetch(`${getCurrentHost()}/api/users/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, frontendURLcurrentRunningOrigin}),
       });
 
       const data = await response.json();
