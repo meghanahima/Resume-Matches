@@ -22,6 +22,7 @@ router.post("/register", async (req, res) => {
       gender,
       githubProfileUrl,
       linkedinProfileUrl,
+      frontendURL,
     } = req.body;
 
     // Check if user already exists
@@ -56,7 +57,7 @@ router.post("/register", async (req, res) => {
     console.log("User created:", user);
 
     // Send verification email
-    await sendVerificationEmail(email, emailVerificationToken);
+    await sendVerificationEmail(frontendURL, email, emailVerificationToken);
 
     if (user) {
       res.status(201).json({
@@ -65,6 +66,8 @@ router.post("/register", async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        emailVerificationExpires: user.emailVerificationExpires,
+        isEmailVerified: false,
       });
     }
   } catch (error) {
@@ -75,21 +78,14 @@ router.post("/register", async (req, res) => {
 // Verify Email
 router.get("/verify-email/:token", async (req, res) => {
   try {
-    // Add logging to debug
-    console.log("Verification attempt with token:", req.params.token);
+    // Add logging for debugging
+    console.log("Verifying token:", req.params.token);
 
     const user = await User.findOne({
       emailVerificationToken: req.params.token,
       emailVerificationExpires: { $gt: Date.now() },
     });
 
-    if (user.isEmailVerified) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email already verified" });
-    }
-
-    // Add logging to debug
     console.log("Found user:", user);
 
     if (!user) {
@@ -99,17 +95,43 @@ router.get("/verify-email/:token", async (req, res) => {
       });
     }
 
+    if (user.isEmailVerified) {
+      return res.status(200).json({
+        success: true,
+        message: "Email is already verified",
+      });
+    }
+
+    // Update verification status
     user.isEmailVerified = true;
-    // user.emailVerificationToken = undefined;
-    // user.emailVerificationExpires = undefined;
     await user.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "Email verified successfully" });
+    console.log("User after save:", user);
+
+    // Clean up tokens in the background
+    process.nextTick(async () => {
+      try {
+        const userToUpdate = await User.findById(user._id);
+        if (userToUpdate) {
+          // userToUpdate.emailVerificationToken = undefined;
+          // userToUpdate.emailVerificationExpires = undefined;
+          await userToUpdate.save();
+        }
+      } catch (err) {
+        console.error("Token cleanup error:", err);
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+    });
   } catch (error) {
     console.error("Verification error:", error);
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({
+      success: false,
+      message: "Verification failed",
+    });
   }
 });
 
@@ -177,7 +199,7 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).lean();
 
     if (!user) {
       return res
@@ -186,9 +208,11 @@ router.post("/login", async (req, res) => {
     }
 
     if (!user.isEmailVerified) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Please verify your email first" });
+      return res.status(401).json({
+        success: false,
+        message: "Please verify your email first",
+        emailVerificationExpires: user.emailVerificationExpires,
+      });
     }
 
     // Compare password
@@ -197,10 +221,11 @@ router.post("/login", async (req, res) => {
     if (user && isMatch) {
       res.json({
         success: true,
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        mobile: user.mobile,
+        ...user,
+        // _id: user._id,
+        // name: user.name,
+        // email: user.email,
+        // mobile: user.mobile,
         token: generateToken(user._id),
       });
     } else {
@@ -232,17 +257,50 @@ router.get("/profile", protect, async (req, res) => {
   }
 });
 
+// Update Profile
 router.put("/update-profile", protect, async (req, res) => {
   try {
-    const user = await User.findOneAndUpdate({ _id: req.user._id }, req.body, {
-      new: true,
-    });
-    return res.status(200).json({
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Update user fields if they exist in request body
+    if (req.body.name) user.name = req.body.name;
+    if (req.body.mobile) user.mobile = req.body.mobile;
+    if (req.body.gender) user.gender = req.body.gender;
+    if (req.body.githubProfileUrl)
+      user.githubProfileUrl = req.body.githubProfileUrl;
+    if (req.body.linkedinProfileUrl)
+      user.linkedinProfileUrl = req.body.linkedinProfileUrl;
+    if (req.body.profilePic) user.profilePic = req.body.profilePic;
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
       success: true,
-      user,
+      message: "Profile updated successfully",
+      user: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        mobile: updatedUser.mobile,
+        gender: updatedUser.gender,
+        githubProfileUrl: updatedUser.githubProfileUrl,
+        linkedinProfileUrl: updatedUser.linkedinProfileUrl,
+        profilePic: updatedUser.profilePic,
+        isEmailVerified: updatedUser.isEmailVerified,
+      },
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    console.error("Profile update error:", error);
+    res.status(400).json({
+      success: false,
+      message: "Failed to update profile",
+    });
   }
 });
 
@@ -398,6 +456,48 @@ router.put("/remove-profile-pic", protect, async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Profile picture removed successfully",
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// Resend Verification Email
+router.post("/resend-verification", async (req, res) => {
+  try {
+    const { email, frontendURL } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is already verified",
+      });
+    }
+
+    // Generate new verification token
+    const emailVerificationToken = crypto.randomBytes(32).toString("hex");
+
+    // Update user with new token and expiry
+    user.emailVerificationToken = emailVerificationToken;
+    user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    await user.save();
+
+    // Resend verification email
+    console.log("emailVerificationToken", emailVerificationToken);
+    await sendVerificationEmail(frontendURL, email, emailVerificationToken);
+
+    res.status(200).json({
+      success: true,
+      message: "Verification email has been resent",
+      emailVerificationExpires: user.emailVerificationExpires, // Return the new expiry time
     });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });

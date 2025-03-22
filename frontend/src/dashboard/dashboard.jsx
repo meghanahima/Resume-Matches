@@ -35,6 +35,14 @@ const Dashboard = ({ isLoggedIn, onLogin }) => {
     }
   };
 
+  const handleDiscoverJobs = () => {
+    if (isLoggedIn) {
+      navigate("/find-jobs");
+    } else {
+      navigate("/login", { state: { from: "dashboard" } });
+    }
+  };
+
   const handleLoginSuccess = () => {
     setShowLoginPopup(false);
     onLogin();
@@ -57,7 +65,15 @@ const Dashboard = ({ isLoggedIn, onLogin }) => {
           </p>
           <animated.div style={slideUp} className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <div className="relative">
+              <button
+                onClick={handleDiscoverJobs}
+                className="px-8 py-4 bg-blue-600 text-white rounded-full text-lg font-medium 
+                           transition-all hover:bg-blue-700 hover:scale-105 active:scale-95
+                           shadow-lg hover:shadow-xl w-full sm:w-auto"
+              >
+                Discover Jobs
+              </button>
+              {/* <div className="relative">
                 <input
                   type="file"
                   id="resume-upload"
@@ -84,14 +100,14 @@ const Dashboard = ({ isLoggedIn, onLogin }) => {
                          shadow-lg hover:shadow-xl"
               >
                 Find Jobs
-              </button>
+              </button> */}
             </div>
             <p className="text-sm text-gray-500">
               {isLoggedIn
                 ? resumeFile
                   ? "Click Find Jobs to continue"
-                  : "Upload your resume to get started"
-                : "Login required to access all features"}
+                  : "Upload your resume and the Top picks just for you"
+                : "Login required to access features"}
             </p>
           </animated.div>
         </div>

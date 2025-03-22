@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSpring, animated } from "@react-spring/web";
 import boyProfilePic from "../assets/boyProfilePic.png";
 import girlProfilePic from "../assets/girlProfilePic.png";
 
 const NavBar = ({ isLoggedIn }) => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const menuRef = useRef(null);
@@ -37,7 +38,7 @@ const NavBar = ({ isLoggedIn }) => {
   return (
     <animated.nav
       style={fadeIn}
-      className="bg-white border-b border-gray-200 fixed w-full top-0 z-50"
+      className="bg-white shadow-sm sticky top-0 z-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
@@ -48,21 +49,9 @@ const NavBar = ({ isLoggedIn }) => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Link
-              to="/find-jobs"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
-                ${
-                  isActive("/find-jobs")
-                    ? "text-blue-600 bg-blue-50"
-                    : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
-                }`}
-            >
-              Find Jobs
-            </Link>
-
             {isLoggedIn && (
               <>
-                <Link
+                {/* <Link
                   to="/resume-builder"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
                     ${
@@ -72,6 +61,17 @@ const NavBar = ({ isLoggedIn }) => {
                     }`}
                 >
                   Resume Builder
+                </Link> */}
+                <Link
+                  to="/find-jobs"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
+                    ${
+                      isActive("/find-jobs")
+                        ? "text-blue-600 bg-blue-50"
+                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                    }`}
+                >
+                  Find Jobs
                 </Link>
                 <Link
                   to="/your-activity"

@@ -55,6 +55,7 @@ const Login = ({ isSignUp = false, showToast }) => {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
+        console.log(isSignUp, "hello megh");
         if (isSignUp) {
           const payload = {
             name: formData.name,
@@ -62,6 +63,9 @@ const Login = ({ isSignUp = false, showToast }) => {
             password: formData.password,
             mobile: parseInt(formData.phone),
             gender: formData.gender,
+            githubProfileUrl: formData?.github || "",
+            linkedinProfileUrl: formData?.linkedin || "",
+            frontendURL: req.get("host"),
           };
 
           const response = await fetch(
@@ -78,11 +82,10 @@ const Login = ({ isSignUp = false, showToast }) => {
           const data = await response.json();
 
           if (response.status === 201) {
-            showToast(
-              data.message ||
-                "Registration successful. Please check your email to verify your account."
-            );
-            navigate("/login");
+            // Store user data including verification expiry
+            localStorage.setItem("userData", JSON.stringify(data));
+            navigate("/verification-email-sent");
+            showToast("Registration successful! Please verify your email.");
           } else {
             showToast(data.message || "Registration failed", "error");
           }
@@ -102,7 +105,21 @@ const Login = ({ isSignUp = false, showToast }) => {
 
           const data = await response.json();
 
-          if (response.status !== 200) {
+          if (
+            response.status === 401 &&
+            data.message === "Please verify your email first"
+          ) {
+            // Store user data including verification expiry
+            localStorage.setItem(
+              "userData",
+              JSON.stringify({
+                email: formData.email,
+                emailVerificationExpires: data.emailVerificationExpires,
+                isEmailVerified: false,
+              })
+            );
+            navigate("/verification-email-sent");
+          } else if (response.status !== 200) {
             showToast(data?.message || "Login failed", "error");
           } else {
             localStorage.setItem("userData", JSON.stringify(data));

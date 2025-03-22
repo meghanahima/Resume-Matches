@@ -78,10 +78,10 @@ export async function uploadFileToAzure(
 
     try {
       let temp = await blockBlobClient.uploadData(file);
-      console.log("Image uploaded successfully!", temp);
-      console.log(
-        `https://${accountName}.blob.core.windows.net/${containerName}/${fileName}`
-      );
+      // console.log("Image uploaded successfully!", temp);
+      // console.log(
+      //   `https://${accountName}.blob.core.windows.net/${containerName}/${fileName}`
+      // );
 
       resolve({
         // success: "Image uploaded successfully!",
@@ -99,3 +99,46 @@ export async function uploadFileToAzure(
     }
   });
 }
+
+// export async function uploadFileToAzure(
+//   fileName,
+//   file
+//   //   { action = "profile" }
+// ) {
+//   return new Promise(async (resolve, reject) => {
+//     console.log("gelloin azue");
+//     if (!file) {
+//       console.error("No file selected");
+//       resolve({
+//         error: "No file selected",
+//       });
+//     }
+
+//     const accountName = import.meta.env.VITE_AZURE_ACCOUNT_NAME;
+//     const containerName = import.meta.env.VITE_AZURE_CONTAINER_NAME;
+//     // const sasToken = import.meta.env.VITE_AZURE_SAS_TOKEN;
+
+//     const blobServiceClient = new BlobServiceClient(
+//       import.meta.env.VITE_BLOB_SAS_URL
+//     );
+//     const containerClient = blobServiceClient.getContainerClient(containerName);
+//     const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+
+//     try {
+//       const temp = await blockBlobClient.uploadData(file);
+
+//       resolve({
+//         url: `https://${accountName}.blob.core.windows.net/${containerName}/${fileName}`,
+//         data: temp,
+//         success: true,
+//       });
+//     } catch (error) {
+//       console.error("Error uploading image:", error.message);
+//       resolve({
+//         error: "Error uploading image:",
+//         data: error,
+//         success: false,
+//       });
+//     }
+//   });
+// }

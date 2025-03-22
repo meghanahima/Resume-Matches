@@ -4,6 +4,7 @@ import html2pdf from "html2pdf.js";
 import SideBar from "./sideBar";
 import { FaPlus, FaPuzzlePiece, FaTimes } from "react-icons/fa";
 import { AddSectionModal } from "./AddSectionModal";
+import ResumePage from "./ResumePage";
 
 const ResumeBuilder = () => {
   const resumeRef = useRef(null);
@@ -34,64 +35,20 @@ const ResumeBuilder = () => {
       phone: "",
       location: "",
       linkedin: "",
-      portfolio: "",
     },
     summary: "",
-    skills: [{ skill: "", level: "intermediate" }],
-    languages: [{ language: "English", level: "proficient" }],
-    employmentHistory: [
-      {
-        jobTitle: "Software Engineer",
-        company: "Example Corp",
-        city: "New York",
-        startDate: "2022-01-01",
-        endDate: "2023-01-01",
-        description: "Developed features for a web application.",
-        presentWorking: false,
-      },
-    ],
-    internships: [
-      {
-        jobTitle: "Intern",
-        employer: "Example Inc",
-        startDate: "2021-06-01",
-        endDate: "2021-08-31",
-        city: "Los Angeles",
-        description: "Assisted with various tasks.",
-      },
-    ],
-    projects: [
-      {
-        title: "Personal Website",
-        techStackUsed: ["React", "Tailwind CSS"],
-        role: "Front-end Developer",
-        description: "Created a personal website to showcase skills.",
-      },
-    ],
-    education: [
-      {
-        degree: "Bachelor of Science",
-        institution: "Example University",
-        year: "2022",
-      },
-    ],
-    courses: [
-      {
-        course: "Web Development Bootcamp",
-        institution: "Example Academy",
-        startDate: "2021-01-01",
-        endDate: "2021-03-31",
-      },
-    ],
-    achievements: [
-      {
-        title: "Employee of the Month",
-        date: "2022-12-01",
-        description: "Recognized for outstanding performance.",
-        issuer: "Example Corp",
-      },
-    ],
-    hobbies: ["Reading", "Hiking"],
+    experience: [],
+    education: [],
+    skills: [],
+    languages: [],
+    projects: [],
+    achievements: [],
+    strengths: [],
+    volunteering: [],
+    certifications: [],
+    awards: [],
+    publications: [],
+    interests: [],
   });
 
   const fadeIn = useSpring({
@@ -169,20 +126,20 @@ const ResumeBuilder = () => {
 
   const handleEmploymentHistoryChange = (index, field, value) => {
     setResumeData((prev) => {
-      const newEmploymentHistory = [...prev.employmentHistory];
+      const newEmploymentHistory = [...prev.experience];
       newEmploymentHistory[index] = {
         ...newEmploymentHistory[index],
         [field]: value,
       };
-      return { ...prev, employmentHistory: newEmploymentHistory };
+      return { ...prev, experience: newEmploymentHistory };
     });
   };
 
   const addEmploymentHistory = () => {
     setResumeData((prev) => ({
       ...prev,
-      employmentHistory: [
-        ...prev.employmentHistory,
+      experience: [
+        ...prev.experience,
         {
           jobTitle: "",
           company: "",
@@ -199,23 +156,23 @@ const ResumeBuilder = () => {
   const removeEmploymentHistory = (index) => {
     setResumeData((prev) => ({
       ...prev,
-      employmentHistory: prev.employmentHistory.filter((_, i) => i !== index),
+      experience: prev.experience.filter((_, i) => i !== index),
     }));
   };
 
   const handleInternshipsChange = (index, field, value) => {
     setResumeData((prev) => {
-      const newInternships = [...prev.internships];
+      const newInternships = [...prev.volunteering];
       newInternships[index] = { ...newInternships[index], [field]: value };
-      return { ...prev, internships: newInternships };
+      return { ...prev, volunteering: newInternships };
     });
   };
 
   const addInternship = () => {
     setResumeData((prev) => ({
       ...prev,
-      internships: [
-        ...prev.internships,
+      volunteering: [
+        ...prev.volunteering,
         {
           jobTitle: "",
           employer: "",
@@ -231,7 +188,7 @@ const ResumeBuilder = () => {
   const removeInternship = (index) => {
     setResumeData((prev) => ({
       ...prev,
-      internships: prev.internships.filter((_, i) => i !== index),
+      volunteering: prev.volunteering.filter((_, i) => i !== index),
     }));
   };
 
@@ -295,17 +252,17 @@ const ResumeBuilder = () => {
 
   const handleCoursesChange = (index, field, value) => {
     setResumeData((prev) => {
-      const newCourses = [...prev.courses];
+      const newCourses = [...prev.certifications];
       newCourses[index] = { ...newCourses[index], [field]: value };
-      return { ...prev, courses: newCourses };
+      return { ...prev, certifications: newCourses };
     });
   };
 
   const addCourse = () => {
     setResumeData((prev) => ({
       ...prev,
-      courses: [
-        ...prev.courses,
+      certifications: [
+        ...prev.certifications,
         { course: "", institution: "", startDate: "", endDate: "" },
       ],
     }));
@@ -314,7 +271,7 @@ const ResumeBuilder = () => {
   const removeCourse = (index) => {
     setResumeData((prev) => ({
       ...prev,
-      courses: prev.courses.filter((_, i) => i !== index),
+      certifications: prev.certifications.filter((_, i) => i !== index),
     }));
   };
 
@@ -345,11 +302,11 @@ const ResumeBuilder = () => {
 
   const handleHobbiesChange = (index, value) => {
     setResumeData((prev) => {
-      const newHobbies = [...prev.hobbies];
+      const newHobbies = [...prev.interests];
       newHobbies[index] = value;
       return {
         ...prev,
-        hobbies: newHobbies,
+        interests: newHobbies,
       };
     });
   };
@@ -357,39 +314,39 @@ const ResumeBuilder = () => {
   const addHobby = () => {
     setResumeData((prev) => ({
       ...prev,
-      hobbies: [...prev.hobbies, ""],
+      interests: [...prev.interests, ""],
     }));
   };
 
   const removeHobby = (index) => {
     setResumeData((prev) => ({
       ...prev,
-      hobbies: prev.hobbies.filter((_, i) => i !== index),
+      interests: prev.interests.filter((_, i) => i !== index),
     }));
   };
 
-  const downloadPDF = () => {
-    const element = resumeRef.current;
+  // const downloadPDF = () => {
+  //   const element = resumeRef.current;
 
-    if (!element) {
-      console.error("Resume element not found.  Check the ref.");
-      return;
-    }
+  //   if (!element) {
+  //     console.error("Resume element not found.  Check the ref.");
+  //     return;
+  //   }
 
-    const opt = {
-      margin: [10, 10],
-      filename: `${resumeData.contact_info.name.replace(
-        /\s+/g,
-        "_"
-      )}_resume.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
-    };
+  //   const opt = {
+  //     margin: [10, 10],
+  //     filename: `${resumeData.contact_info.name.replace(
+  //       /\s+/g,
+  //       "_"
+  //     )}_resume.pdf`,
+  //     image: { type: "jpeg", quality: 0.98 },
+  //     html2canvas: { scale: 2 },
+  //     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+  //     pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+  //   };
 
-    html2pdf().set(opt).from(element).save();
-  };
+  //   html2pdf().set(opt).from(element).save();
+  // };
 
   const SkillLevelSlider = ({ level, onChange }) => {
     const levels = ["beginner", "intermediate", "proficient"];
@@ -614,107 +571,101 @@ const ResumeBuilder = () => {
   };
 
   const handleAddSection = (sectionId) => {
-    console.log(sectionId, "sectionid");
     if (activeSections.includes(sectionId)) {
       handleRemoveSection(sectionId);
       return;
     }
 
     setActiveSections((prev) => [...prev, sectionId]);
-
-    // Initialize section data based on type
-    switch (sectionId) {
-      case "summary":
-        setResumeData((prev) => ({
-          ...prev,
-          summary: "",
-        }));
-        break;
-      case "experience":
-        setResumeData((prev) => ({
-          ...prev,
-          experience: [
-            {
-              title: "",
-              company: "",
-              location: "",
-              startDate: "",
-              endDate: "",
-              description: "",
-              isPresent: false,
-            },
-          ],
-        }));
-        break;
-      case "education":
-        setResumeData((prev) => ({
-          ...prev,
-          education: [
-            {
-              degree: "",
-              institution: "",
-              location: "",
-              graduationDate: "",
-              gpa: "",
-            },
-          ],
-        }));
-        break;
-      case "skills":
-        setResumeData((prev) => ({
-          ...prev,
-          skills: [
-            {
-              category: "",
-              skills: [],
-            },
-          ],
-        }));
-        break;
-      case "languages":
-        setResumeData((prev) => ({
-          ...prev,
-          languages: [
-            {
-              language: "",
-              level: "intermediate",
-            },
-          ],
-        }));
-        break;
-      case "projects":
-        setResumeData((prev) => ({
-          ...prev,
-          projects: [
-            {
-              title: "",
-              techStack: [],
-              description: "",
-              link: "",
-            },
-          ],
-        }));
-        break;
-      case "achievements":
-        setResumeData((prev) => ({
-          ...prev,
-          achievements: [
-            {
-              title: "",
-              date: "",
-              description: "",
-            },
-          ],
-        }));
-        break;
-      // Add other cases for remaining sections
-    }
-
+    initializeSectionData(sectionId);
     setShowAddSectionModal(false);
   };
 
   const handleRemoveSection = (sectionId) => {
     setActiveSections((prev) => prev.filter((id) => id !== sectionId));
+  };
+
+  const initializeSectionData = (sectionId) => {
+    setResumeData((prev) => {
+      if (!Array.isArray(prev[sectionId]) || prev[sectionId].length === 0) {
+        const initialData = {
+          experience: {
+            jobTitle: "",
+            company: "",
+            city: "",
+            startDate: "",
+            endDate: "",
+            description: "",
+            presentWorking: false,
+          },
+          education: {
+            degree: "",
+            institution: "",
+            year: "",
+          },
+          skills: {
+            skill: "",
+            level: "intermediate",
+          },
+          languages: {
+            language: "",
+            proficiency: "intermediate",
+          },
+          projects: {
+            title: "",
+            description: "",
+            technologies: "",
+            link: "",
+            duration: "",
+          },
+          achievements: {
+            title: "",
+            date: "",
+            description: "",
+          },
+          strengths: {
+            category: "",
+            description: "",
+          },
+          volunteering: {
+            organization: "",
+            role: "",
+            duration: "",
+            description: "",
+          },
+          certifications: {
+            name: "",
+            issuer: "",
+            date: "",
+            expiryDate: "",
+            credentialId: "",
+          },
+          awards: {
+            title: "",
+            issuer: "",
+            date: "",
+            description: "",
+          },
+          publications: {
+            title: "",
+            publisher: "",
+            date: "",
+            link: "",
+            description: "",
+          },
+          interests: {
+            category: "",
+            items: [],
+          },
+        };
+
+        return {
+          ...prev,
+          [sectionId]: [initialData[sectionId]],
+        };
+      }
+      return prev;
+    });
   };
 
   const EmptySectionCard = () => (
@@ -727,7 +678,7 @@ const ResumeBuilder = () => {
           <div className="flex flex-col items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
               <FaPuzzlePiece className="w-8 h-8 text-blue-500 group-hover:scale-110 transition-transform" />
-            </div>
+                                </div>
             <div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
                 Add Your First Section
@@ -739,386 +690,33 @@ const ResumeBuilder = () => {
                 <FaPlus className="w-4 h-4" />
                 Add Section
               </span>
-            </div>
-          </div>
+                            </div>
+                                  </div>
           <div className="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-10 rounded-xl transition-opacity" />
-        </div>
-      </div>
-    </div>
+                                  </div>
+                                  </div>
+                                </div>
   );
-
-  // Professional input field component
-  // Update the ResumeInput component
-  const ResumeInput = ({
-    value,
-    onChange,
-    placeholder,
-    multiline = false,
-    className = "",
-    type = "text",
-    disabled = false,
-  }) => {
-    const inputRef = useRef(null);
-  
-    const baseClasses = `
-      w-full 
-      border-b 
-      border-transparent hover:border-gray-300 
-      focus:border-blue-500 
-      transition-colors
-      bg-transparent
-      focus:outline-none
-      focus:ring-0
-      px-2 
-      py-1 
-      rounded
-      ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-text"}
-      ${className}
-    `;
-  
-    if (multiline) {
-      return (
-        <textarea
-          ref={inputRef}
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          disabled={disabled}
-          className={`${baseClasses} resize-none min-h-[100px]`}
-          rows={4}
-        />
-      );
-    }
-  
-    return (
-      <input
-        ref={inputRef}
-        type={type}
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        disabled={disabled}
-        className={baseClasses}
-      />
-    );
-  };
-
-  
-
-  // Resume page component
-  const ResumePage = ({ pageNumber }) => (
-    <div className="w-[210mm] min-h-[297mm] bg-white p-[25mm] shadow-lg mb-8">
-      {pageNumber === 1 && (
-        <>
-          {/* Contact Section */}
-          <div className="mb-8">
-            <ResumeInput
-              value={resumeData.contact_info.name}
-              onChange={(value) => handleContactInfoChange("name", value)}
-              placeholder="Full Name"
-              className="text-3xl font-bold mb-4 hover:bg-gray-50/50"
-            />
-            <div className="grid grid-cols-2 gap-4 text-gray-600">
-              <div className="group relative">
-                <ResumeInput
-                  value={resumeData.contact_info.email}
-                  onChange={(value) => handleContactInfoChange("email", value)}
-                  placeholder="Email"
-                  className="group-hover:bg-gray-50/50"
-                />
-              </div>
-              <div className="group relative">
-                <ResumeInput
-                  value={resumeData.contact_info.phone}
-                  onChange={(value) => handleContactInfoChange("phone", value)}
-                  placeholder="phone"
-                  className="group-hover:bg-gray-50/50"
-                />
-              </div>
-              <div className="group relative">
-                <ResumeInput
-                  value={resumeData.contact_info.location}
-                  onChange={(value) =>
-                    handleContactInfoChange("location", value)
-                  }
-                  placeholder="location"
-                  className="group-hover:bg-gray-50/50"
-                />
-              </div>
-              <div className="group relative">
-                <ResumeInput
-                  value={resumeData.contact_info.linkedin}
-                  onChange={(value) =>
-                    handleContactInfoChange("linkedin", value)
-                  }
-                  placeholder="linkedin"
-                  className="group-hover:bg-gray-50/50"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Summary Section */}
-          {activeSections.includes("summary") && (
-            <div className="mb-8 relative group">
-              <div className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={() => handleRemoveSection("summary")}
-                  className="text-red-500 hover:text-red-700 text-sm"
-                >
-                  Remove
-                </button>
-              </div>
-              <h2 className="text-lg font-semibold text-gray-800 mb-3 uppercase tracking-wider border-b pb-2">
-                Professional Summary
-              </h2>
-              <ResumeInput
-                value={resumeData.summary}
-                onChange={(value) => handleInputChange("summary", value)}
-                placeholder="Write your professional summary..."
-                multiline
-                className="group-hover:bg-gray-50/50"
-              />
-            </div>
-          )}
-
-          {/* Other sections */}
-          {
-            // console.log("activeSections", activeSections);
-            activeSections
-              .filter(
-                (section) => section !== "contact" && section !== "summary"
-              )
-              .map((section) => (
-                <div key={section} className="mb-8 relative group">
-                  <div className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleRemoveSection(section)}
-                      className="text-red-500 hover:text-red-700 text-sm"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                  <RenderSection
-                    section={section}
-                    data={resumeData[section]}
-                    onChange={(value) => handleInputChange(section, value)}
-                  />
-                </div>
-              ))
-          }
-
-          {/* Add Section Card */}
-          {/* {activeSections.length <= 2 && ( */}
-          <div
-            onClick={() => setShowAddSectionModal(true)}
-            className="mt-12 border-2 border-dashed border-gray-300 rounded-xl p-8 cursor-pointer hover:border-blue-400 hover:bg-blue-50/20 transition-all duration-300 text-center"
-          >
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-                <FaPlus className="w-8 h-8 text-blue-500" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Add a Section
-                </h3>
-                <p className="text-gray-600">
-                  Enhance your resume with additional sections
-                </p>
-              </div>
-            </div>
-          </div>
-          {/* )} */}
-        </>
-      )}
-    </div>
-  );
-
-  // Section renderer component
-  const RenderSection = ({ section, data, onChange }) => {
-    switch (section) {
-      case "experience":
-        return (
-          <>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3 uppercase tracking-wider border-b pb-2">
-              Work Experience
-            </h2>
-            {data.map((exp, index) => (
-              <div key={index} className="mb-6">
-                <ResumeInput
-                  value={exp.jobTitle}
-                  onChange={(value) =>
-                    handleEmploymentHistoryChange(index, "jobTitle", value)
-                  }
-                  placeholder="Job Title"
-                  className="font-semibold"
-                />
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  <ResumeInput
-                    value={exp.company}
-                    onChange={(value) =>
-                      handleEmploymentHistoryChange(index, "company", value)
-                    }
-                    placeholder="Company"
-                  />
-                  <ResumeInput
-                    value={exp.city}
-                    onChange={(value) =>
-                      handleEmploymentHistoryChange(index, "city", value)
-                    }
-                    placeholder="Location"
-                  />
-                  <ResumeInput
-                    value={exp.startDate}
-                    onChange={(value) =>
-                      handleEmploymentHistoryChange(index, "startDate", value)
-                    }
-                    placeholder="Start Date"
-                    type="date"
-                  />
-                  <ResumeInput
-                    value={exp.endDate}
-                    onChange={(value) =>
-                      handleEmploymentHistoryChange(index, "endDate", value)
-                    }
-                    placeholder="End Date"
-                    type="date"
-                    disabled={exp.presentWorking}
-                  />
-                </div>
-                <ResumeInput
-                  value={exp.description}
-                  onChange={(value) =>
-                    handleEmploymentHistoryChange(index, "description", value)
-                  }
-                  placeholder="Description"
-                  multiline
-                  className="mt-2"
-                />
-              </div>
-            ))}
-            <button
-              onClick={addEmploymentHistory}
-              className="text-blue-500 hover:text-blue-700 text-sm flex items-center gap-2"
-            >
-              <FaPlus /> Add Experience
-            </button>
-          </>
-        );
-
-      case "skills":
-        return (
-          <>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3 uppercase tracking-wider border-b pb-2">
-              Skills
-            </h2>
-            {data.map((skill, index) => (
-              <div key={index} className="mb-4 flex items-center gap-4">
-                <ResumeInput
-                  value={skill.skill}
-                  onChange={(value) =>
-                    handleSkillsChange(index, "skill", value)
-                  }
-                  placeholder="Skill"
-                  className="flex-1"
-                />
-                <select
-                  value={skill.level}
-                  onChange={(e) =>
-                    handleSkillsChange(index, "level", e.target.value)
-                  }
-                  className="px-3 py-1 border rounded-md"
-                >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
-                <button
-                  onClick={() => removeSkill(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <FaTimes />
-                </button>
-              </div>
-            ))}
-            <button
-              onClick={addSkill}
-              className="text-blue-500 hover:text-blue-700 text-sm flex items-center gap-2"
-            >
-              <FaPlus /> Add Skill
-            </button>
-          </>
-        );
-
-      case "education":
-        return (
-          <>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3 uppercase tracking-wider border-b pb-2">
-              Education
-            </h2>
-            {data.map((edu, index) => (
-              <div key={index} className="mb-6">
-                <ResumeInput
-                  value={edu.degree}
-                  onChange={(value) =>
-                    handleEducationChange(index, "degree", value)
-                  }
-                  placeholder="Degree"
-                  className="font-semibold"
-                />
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  <ResumeInput
-                    value={edu.institution}
-                    onChange={(value) =>
-                      handleEducationChange(index, "institution", value)
-                    }
-                    placeholder="Institution"
-                  />
-                  <ResumeInput
-                    value={edu.year}
-                    onChange={(value) =>
-                      handleEducationChange(index, "year", value)
-                    }
-                    placeholder="Year"
-                  />
-                </div>
-              </div>
-            ))}
-            <button
-              onClick={addEducation}
-              className="text-blue-500 hover:text-blue-700 text-sm flex items-center gap-2"
-            >
-              <FaPlus /> Add Education
-            </button>
-          </>
-        );
-
-      // Add other cases for remaining sections
-      default:
-        return null;
-    }
-  };
 
   return (
     <div className="bg-gray-50">
       <div className="flex h-screen">
         <SideBar
-          onAddSection={handleAddSection}
-          onRemoveSection={handleRemoveSection}
+          onAddSection={() => setShowAddSectionModal(true)}
           activeSections={activeSections}
         />
 
         <div className="flex-1 overflow-auto">
-          <div className="max-w-[850px] mx-auto py-8">
-            {/* Render pages */}
-            {Array.from({ length: Math.ceil(activeSections.length / 4) }).map(
-              (_, index) => (
-                <ResumePage key={index} pageNumber={index + 1} />
-              )
-            )}
-          </div>
-        </div>
-      </div>
+          <ResumePage
+            resumeData={resumeData}
+            activeSections={activeSections}
+            onContactInfoChange={handleContactInfoChange}
+            onInputChange={handleInputChange}
+            onRemoveSection={handleRemoveSection}
+            onAddSection={() => setShowAddSectionModal(true)}
+                                        />
+                                      </div>
+                                    </div>
 
       <AddSectionModal
         isOpen={showAddSectionModal}
@@ -1126,8 +724,8 @@ const ResumeBuilder = () => {
         onAddSection={handleAddSection}
         onRemoveSection={handleRemoveSection}
         activeSections={activeSections}
-      />
-    </div>
+                                      />
+                                    </div>
   );
 };
 
@@ -1138,13 +736,13 @@ const ResumeSection = ({ section, isEditing, onEdit, data, onChange }) => {
     <div className="mb-6">
       <h2 className="text-lg font-semibold text-gray-800 mb-2 uppercase tracking-wider">
         {section}
-      </h2>
+                              </h2>
       <div
         className={`${isEditing ? "bg-gray-50 p-4 rounded-lg" : ""}`}
         onClick={onEdit}
       >
         {/* Render section specific content */}
-      </div>
+                              </div>
     </div>
   );
 };

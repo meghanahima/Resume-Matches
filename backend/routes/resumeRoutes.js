@@ -104,7 +104,8 @@ Return the response in the following **valid JSON format**:
     "strengths": string[],                // Max **3 key strengths**  
     "weaknesses": string[],               // Max **3 areas for improvement**  
     "suggestions": string[]               // Max **5 actionable career suggestions**  
-  }
+  },
+  "ATSScore": number | null               // Optional: Include ATS score
 }
 
 ### **Guidelines for Extraction:**  
@@ -124,6 +125,42 @@ ${extractedContent}
   - **3 weaknesses** – Identify areas for development.  
   - **5 career suggestions** – Offer specific recommendations.  
 - Make feedback **actionable** and **tailored to the resume content**.  
+
+### **ATS Scoring Guidelines:**
+- Calculate **Overall ATS Score (0-100)** based on:
+  - **Keyword Optimization (35%)**:
+    - Presence of industry-specific keywords
+    - Appropriate keyword density
+    - Match with job market requirements
+    - Technical skills relevance
+  
+  - **Content Quality (35%)**:
+    - Clear job titles and roles
+    - Quantified achievements
+    - Action verbs usage
+    - Professional summary effectiveness
+    - Experience descriptions clarity
+  
+  - **Information Completeness (30%)**:
+    - Contact information completeness
+    - Work history completeness
+    - Education details presence
+    - Skills and certifications listing
+    - Project details (if applicable)
+    - Chronological order clarity
+  
+- **Scoring Criteria:**
+  - 90-100: Excellent content optimization
+  - 70-89: Good, minor content improvements needed
+  - 50-69: Fair, needs moderate content enhancement
+  - 0-49: Poor, requires major content improvements
+
+### **Scoring Focus:**
+- Emphasis on content quality and relevance
+- Keyword placement and context
+- Information completeness and accuracy
+- Professional language usage
+- Achievement quantification
 `
 
 
@@ -145,7 +182,7 @@ ${extractedContent}
       {
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": "AIzaSyA96FvIGYUT25DoCFH9uJeH1gRJbbwWkJE",
+          "x-goog-api-key": "AIzaSyDhMsMubpUGPOJtOU0dzjYSsH86gB2XKPg",
         },
       }
     );
@@ -182,6 +219,7 @@ ${extractedContent}
     resume.content = extractedContent;
     resume.parsedInfo = parsedContent.parsedInfo;
     resume.analysis = parsedContent.analysis;
+    resume.ATSScore = parsedContent.ATSScore;
     let savedResume = await resume.save();
 
     // Add resume to user's resumes array

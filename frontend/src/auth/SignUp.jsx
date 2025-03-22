@@ -79,8 +79,10 @@ const SignUp = () => {
             Create Account
           </h2>
 
-          <button className="w-full flex items-center justify-center gap-2 border border-gray-300 
-                           rounded-lg py-3 hover:bg-gray-50 transition-colors mb-6">
+          <button
+            className="w-full flex items-center justify-center gap-2 border border-gray-300 
+                           rounded-lg py-3 hover:bg-gray-50 transition-colors mb-6"
+          >
             <img src={GoogleIcon} alt="Google" className="w-5 h-5" />
             <span>Continue with Google</span>
           </button>
@@ -187,4 +189,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp; 
+export default SignUp;

@@ -3,6 +3,7 @@ import { useSpring, animated, config } from "@react-spring/web";
 import { useNavigate } from "react-router-dom";
 import { getCurrentHost } from "../../constants/config";
 import { uploadFileToAzure } from "../../services/azure";
+import Loader from "../../reusableComponents/loader";
 
 const modalOverlayStyle =
   "fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm";
@@ -525,7 +526,6 @@ const FindJobs = ({ showToast }) => {
             userId: userData._id,
             url: uploadedResumeUrl.url,
             title,
-            ATSScore: Math.floor(Math.random() * 100) + 1,
           }),
         }
       );
@@ -807,19 +807,14 @@ const FindJobs = ({ showToast }) => {
         </div>
 
         {/* Loading Progress */}
-        {!showJobs && loadingStep > 0 && (
+        {!resumeFile || (!showJobs && loadingStep > 0) && (
           <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-white rounded-2xl shadow-sm p-8">
+            <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col items-center">
               <h2 className="text-2xl font-semibold mb-6">
                 Finding Your Perfect Jobs
               </h2>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <animated.div
-                  style={loadingAnimation}
-                  className="h-full bg-blue-600 rounded-full"
-                />
-              </div>
-              <p className="mt-4 text-gray-600">
+              <Loader />
+              <p className="mt-6 text-gray-600">
                 {loadingMessages[loadingStep]}
               </p>
             </div>
@@ -835,7 +830,7 @@ const FindJobs = ({ showToast }) => {
                   Job Matches
                 </h2>
                 <p className="text-gray-600 mt-2">
-                  Found {jobs.length} matches based on your profile
+                  Found top {jobs.length} matches based on your profile
                 </p>
               </div>
               {/* <div className="flex gap-4 items-center">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getCurrentHost } from "../../constants/config";
 import { useSpring, animated } from "@react-spring/web";
@@ -6,39 +6,50 @@ import { useSpring, animated } from "@react-spring/web";
 const EmailVerification = ({ showToast }) => {
   const { token } = useParams();
   const [verificationStatus, setVerificationStatus] = useState("verifying");
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const fadeIn = useSpring({
     from: { opacity: 0, transform: "translateY(20px)" },
     to: { opacity: 1, transform: "translateY(0)" },
   });
 
-  useEffect(() => {
-    const verifyEmail = async () => {
-      try {
-        console.log("Attempting verification with token:", token);
+  const verifyEmail = useCallback(async () => {
+    if (isVerifying) return;
+    setIsVerifying(true);
 
-        const response = await fetch(
-          `${getCurrentHost()}/api/users/verify-email/${token}`
-        );
-        const data = await response.json();
+    try {
+      const response = await fetch(
+        `${getCurrentHost()}/api/users/verify-email/${token}`
+      );
+      const data = await response.json();
 
-        console.log("Verification response:", data);
-        if (response.ok) {
-          setVerificationStatus("success");
-          showToast("Email verified successfully!", "success");
-        } else {
-          setVerificationStatus("error");
-          showToast(data.message || "Verification failed", "error");
+      if (data.success) {
+        setVerificationStatus("success");
+        showToast("Email verified successfully!", "success");
+
+        // Update localStorage
+        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        if (userData.email) {
+          const updatedUserData = {
+            ...userData,
+            isEmailVerified: true,
+          };
+          localStorage.setItem("userData", JSON.stringify(updatedUserData));
         }
-      } catch (error) {
-        console.error("Verification error:", error);
+      } else {
         setVerificationStatus("error");
-        showToast("Verification failed. Please try again.", "error");
+        showToast(data.message || "Verification failed", "error");
       }
-    };
+    } catch (error) {
+      console.error("Verification error:", error);
+      setVerificationStatus("error");
+      showToast("Verification failed. Please try again.", "error");
+    }
+  }, [token, showToast]);
 
+  useEffect(() => {
     verifyEmail();
-  }, [token]);
+  }, [verifyEmail]);
 
   const renderContent = () => {
     switch (verificationStatus) {

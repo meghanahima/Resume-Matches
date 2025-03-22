@@ -28,8 +28,8 @@ const sendEmail = async (to, subject, html) => {
   }
 };
 
-const sendVerificationEmail = async (email, token) => {
-  const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${token}`;
+const sendVerificationEmail = async (frontendURL, email, token) => {
+  const verificationUrl = `${frontendURL}/verify-email/${token}`;
   const html = `
     <h1>Email Verification</h1>
     <p>Please click this link to verify your email:</p>

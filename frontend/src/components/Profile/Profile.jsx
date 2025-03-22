@@ -16,8 +16,8 @@ const Profile = ({ showToast }) => {
     name: userData.name || "",
     email: userData.email || "",
     phone: userData.mobile || "",
-    github: userData.githubProfileUrl || "",
-    linkedin: userData.linkedinProfileUrl || "",
+    githubProfileUrl: userData.githubProfileUrl || "",
+    linkedinProfileUrl: userData.linkedinProfileUrl || "",
     gender: userData.gender || "male",
     profilePic: userData.profilePic || null,
   });
@@ -31,8 +31,8 @@ const Profile = ({ showToast }) => {
       name: userData.name || "",
       email: userData.email || "",
       phone: userData.mobile || "",
-      github: userData.githubProfileUrl || "",
-      linkedin: userData.linkedinProfileUrl || "",
+      githubProfileUrl: userData.githubProfileUrl || "",
+      linkedinProfileUrl: userData.linkedinProfileUrl || "",
       gender: userData.gender || "male",
       profilePic: userData.profilePic || null,
     });
@@ -43,8 +43,8 @@ const Profile = ({ showToast }) => {
       name: userData.name || "",
       email: userData.email || "",
       phone: userData.mobile || "",
-      github: userData.githubProfileUrl || "",
-      linkedin: userData.linkedinProfileUrl || "",
+      githubProfileUrl: userData.githubProfileUrl || "",
+      linkedinProfileUrl: userData.linkedinProfileUrl || "",
       gender: userData.gender || "male",
       profilePic: userData.profilePic || null,
     });
@@ -56,78 +56,67 @@ const Profile = ({ showToast }) => {
     setIsSaving(true);
 
     try {
-      // Create an object with only the changed fields
-      const changedFields = {};
+      // Create FormData object to handle file upload
+      const formDataToSend = new FormData();
+
+      // Add all changed fields to FormData
       Object.keys(formData).forEach((key) => {
-        // For all fields except profilePic, compare with userData
         if (key === "profilePic") {
           if (formData.profilePic && formData.profilePic instanceof File) {
-            changedFields.profilePic = formData.profilePic;
+            formDataToSend.append("profilePic", formData.profilePic);
           }
         } else if (key === "phone") {
           if (formData[key] !== userData.mobile) {
-            changedFields[key] = formData[key];
-          }
-        } else if (key === "github") {
-          if (formData[key] !== userData.githubProfileUrl) {
-            changedFields[key] = formData[key];
-          }
-        } else if (key === "linkedin") {
-          if (formData[key] !== userData.linkedinProfileUrl) {
-            changedFields[key] = formData[key];
+            formDataToSend.append("mobile", formData[key]);
           }
         } else if (formData[key] !== userData[key]) {
-          changedFields[key] = formData[key];
+          formDataToSend.append(key, formData[key]);
         }
       });
 
-      // If there's a new profile picture, upload it first
-      if (changedFields.profilePic) {
-        const randomNumber =
-          Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
-        const timestamp = Date.now().toString();
-        const filename = `${randomNumber}_${timestamp}_${changedFields.profilePic.name}`;
-        const fileUploaded = await uploadFileToAzure(
-          filename,
-          changedFields.profilePic
-        );
-        changedFields.profilePic = fileUploaded.url;
-      }
-
-      // Only proceed with the update if there are changes
-      if (Object.keys(changedFields).length > 0) {
-        const response = await fetch(
-          `${getCurrentHost()}/api/users/update-profile`,
-          {
-            method: "PUT",
-            body: JSON.stringify(changedFields),
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${
-                JSON.parse(localStorage.getItem("userData")).token
-              }`,
-            },
-          }
-        );
-
-        if (response.status === 200) {
-          const updatedData = await response.json();
-          const newUserData = {
-            ...userData,
-            ...updatedData.user,
-            token: userData.token,
-          };
-
-          localStorage.setItem("userData", JSON.stringify(newUserData));
-          setUserData(newUserData);
-          setIsEditing(false);
-          showToast("Profile updated successfully", "success");
-        } else {
-          showToast("Failed to update profile", "error");
-        }
-      } else {
+      // Only proceed if there are changes
+      if (formDataToSend.entries().next().done) {
         setIsEditing(false);
         showToast("No changes to update", "info");
+        return;
+      }
+
+      // If there's a new profile picture, upload it first
+      let profilePicUrl = null;
+      if (formData.profilePic instanceof File) {
+        const randomNumber = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+        const timestamp = Date.now().toString();
+        const filename = `${randomNumber}_${timestamp}_${formData.profilePic.name}`;
+        const fileUploaded = await uploadFileToAzure(filename, formData.profilePic);
+        profilePicUrl = fileUploaded.url;
+        formDataToSend.set("profilePic", profilePicUrl);
+      }
+
+      const response = await fetch(
+        `${getCurrentHost()}/api/users/update-profile`,
+        {
+          method: "PUT",
+          body: formDataToSend,
+          headers: {
+            Authorization: `Bearer ${userData.token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const updatedData = await response.json();
+        const newUserData = {
+          ...userData,
+          ...updatedData.user,
+          token: userData.token,
+        };
+
+        localStorage.setItem("userData", JSON.stringify(newUserData));
+        setUserData(newUserData);
+        setIsEditing(false);
+        showToast("Profile updated successfully", "success");
+      } else {
+        showToast("Failed to update profile", "error");
       }
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -371,8 +360,8 @@ const Profile = ({ showToast }) => {
                     </label>
                     <input
                       type="url"
-                      name="github"
-                      value={formData.github}
+                      name="githubProfileUrl"
+                      value={formData.githubProfileUrl}
                       onChange={handleChange}
                       disabled={!isEditing}
                       placeholder="https://github.com/username"
@@ -386,8 +375,8 @@ const Profile = ({ showToast }) => {
                     </label>
                     <input
                       type="url"
-                      name="linkedin"
-                      value={formData.linkedin}
+                      name="linkedinProfileUrl"
+                      value={formData.linkedinProfileUrl}
                       onChange={handleChange}
                       disabled={!isEditing}
                       placeholder="https://linkedin.com/in/username"

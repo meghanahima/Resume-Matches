@@ -17,6 +17,7 @@ import Profile from "./components/Profile/Profile";
 import EmailVerification from "./components/EmailVerification/EmailVerification";
 import PasswordReset from "./components/PasswordReset/PasswordReset";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
+import VerifyEmail from "./components/EmailVerification/VerifyEmail";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -63,6 +64,10 @@ function App() {
             <Route
               path="/forgot-password"
               element={<ForgotPassword showToast={showToast} />}
+            />
+            <Route
+              path="/verification-email-sent"
+              element={<VerifyEmail showToast={showToast} />}
             />
           </Routes>
         </main>
