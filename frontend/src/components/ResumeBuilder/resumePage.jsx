@@ -1,5 +1,5 @@
 import React from 'react';
-import ResumeInput from './ResumeInput';
+import ResumeInput from './resumeInput';
 import SectionRenderer from './SectionRenderer';
 import { FaPlus } from 'react-icons/fa';
 
