@@ -35,7 +35,9 @@ const ResumeCard = ({ resume, isExpanded, onToggle }) => {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-medium text-gray-900">
-                  {resume.parsedInfo?.contact_info?.name || resume.title}
+                  {
+                  // resume.parsedInfo?.contact_info?.name || 
+                  resume.title}
                 </h3>
                 <div className="flex items-center gap-3 mt-1 text-sm text-gray-600">
                   <span className="flex items-center gap-1">
