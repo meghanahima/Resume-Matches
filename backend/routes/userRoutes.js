@@ -260,6 +260,8 @@ router.get("/profile", protect, async (req, res) => {
 // Update Profile
 router.put("/update-profile", protect, async (req, res) => {
   try {
+    console.log("Update profile request body:", req.body);
+
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({
@@ -268,16 +270,20 @@ router.put("/update-profile", protect, async (req, res) => {
       });
     }
 
-    // Update user fields if they exist in request body
-    if (req.body.name) user.name = req.body.name;
-    if (req.body.mobile) user.mobile = req.body.mobile;
-    if (req.body.gender) user.gender = req.body.gender;
-    if (req.body.githubProfileUrl)
-      user.githubProfileUrl = req.body.githubProfileUrl;
-    if (req.body.linkedinProfileUrl)
-      user.linkedinProfileUrl = req.body.linkedinProfileUrl;
-    if (req.body.profilePic) user.profilePic = req.body.profilePic;
+    // Create update object with only valid fields
+    const updateFields = {};
+    const allowedFields = ['name', 'mobile', 'gender', 'githubProfileUrl', 'linkedinProfileUrl', 'profilePic'];
+    
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updateFields[field] = req.body[field];
+      }
+    });
 
+    console.log("Fields to update:", updateFields);
+
+    // Update user with the new fields
+    Object.assign(user, updateFields);
     const updatedUser = await user.save();
 
     res.status(200).json({

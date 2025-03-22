@@ -56,58 +56,57 @@ const Profile = ({ showToast }) => {
     setIsSaving(true);
 
     try {
-      // Create FormData object to handle file upload
-      const formDataToSend = new FormData();
+      let updatedFields = {};
 
-      // Add all changed fields to FormData
+      // Add all changed fields to the update object
       Object.keys(formData).forEach((key) => {
         if (key === "profilePic") {
           if (formData.profilePic && formData.profilePic instanceof File) {
-            formDataToSend.append("profilePic", formData.profilePic);
+            updatedFields.profilePic = formData.profilePic;
           }
         } else if (key === "phone") {
           if (formData[key] !== userData.mobile) {
-            formDataToSend.append("mobile", formData[key]);
+            updatedFields.mobile = formData[key];
           }
         } else if (formData[key] !== userData[key]) {
-          formDataToSend.append(key, formData[key]);
+          updatedFields[key] = formData[key];
         }
       });
 
       // Only proceed if there are changes
-      if (formDataToSend.entries().next().done) {
+      if (Object.keys(updatedFields).length === 0) {
         setIsEditing(false);
         showToast("No changes to update", "info");
         return;
       }
 
       // If there's a new profile picture, upload it first
-      let profilePicUrl = null;
-      if (formData.profilePic instanceof File) {
+      if (updatedFields.profilePic instanceof File) {
         const randomNumber = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
         const timestamp = Date.now().toString();
-        const filename = `${randomNumber}_${timestamp}_${formData.profilePic.name}`;
-        const fileUploaded = await uploadFileToAzure(filename, formData.profilePic);
-        profilePicUrl = fileUploaded.url;
-        formDataToSend.set("profilePic", profilePicUrl);
+        const filename = `${randomNumber}_${timestamp}_${updatedFields.profilePic.name}`;
+        const fileUploaded = await uploadFileToAzure(filename, updatedFields.profilePic);
+        updatedFields.profilePic = fileUploaded.url;
       }
 
       const response = await fetch(
         `${getCurrentHost()}/api/users/update-profile`,
         {
           method: "PUT",
-          body: formDataToSend,
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${userData.token}`,
           },
+          body: JSON.stringify(updatedFields),
         }
       );
 
+      const data = await response.json();
+
       if (response.ok) {
-        const updatedData = await response.json();
         const newUserData = {
           ...userData,
-          ...updatedData.user,
+          ...data.user,
           token: userData.token,
         };
 
@@ -116,7 +115,7 @@ const Profile = ({ showToast }) => {
         setIsEditing(false);
         showToast("Profile updated successfully", "success");
       } else {
-        showToast("Failed to update profile", "error");
+        showToast(data.message || "Failed to update profile", "error");
       }
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -276,7 +275,7 @@ const Profile = ({ showToast }) => {
                       </button>
                     )}
                   </div>
-                  {isEditing && (
+                  {/* {isEditing && (
                     <div>
                       <label
                         htmlFor="profile-upload"
@@ -293,7 +292,7 @@ const Profile = ({ showToast }) => {
                         className="hidden"
                       />
                     </div>
-                  )}
+                  )} */}
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
