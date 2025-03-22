@@ -1,5 +1,5 @@
 import React from "react";
-import ResumeInput from "./ResumeInput";
+import ResumeInput from "./resumeInput";
 import { FaPlus, FaTimes } from "react-icons/fa";
 
 const SectionRenderer = ({ section, data = [], onChange, onRemove }) => {
