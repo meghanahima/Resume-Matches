@@ -4,7 +4,7 @@ import html2pdf from "html2pdf.js";
 import SideBar from "./sideBar";
 import { FaPlus, FaPuzzlePiece, FaTimes } from "react-icons/fa";
 import { AddSectionModal } from "./AddSectionModal";
-import ResumePage from "./ResumePage";
+import ResumePage from "./resumePage";
 
 const ResumeBuilder = () => {
   const resumeRef = useRef(null);

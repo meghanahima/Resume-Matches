@@ -5,11 +5,17 @@ const User = require("../schema/userSchema");
 const { protect } = require("../middleware/authMiddleware");
 const axios = require("axios");
 const FileProcessingService = require("../services/fileProcessingService");
+const apiKeyService = require("../services/apiKeyService");
 
 // Create new resume
 router.post("/save-resume", protect, async (req, res) => {
   try {
     const body = req.body;
+    const API_KEY = apiKeyService.getResumeApiKey();
+
+    if (!API_KEY) {
+      throw new Error('Missing API key for Gemini API');
+    }
 
     // Save resume document with URL
     let resume = await Resume.create(body);
@@ -182,7 +188,7 @@ ${extractedContent}
       {
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": "AIzaSyDhMsMubpUGPOJtOU0dzjYSsH86gB2XKPg",
+          "x-goog-api-key": API_KEY,
         },
       }
     );
@@ -239,7 +245,12 @@ ${extractedContent}
     res.status(400).json({
       success: false,
       message: error.message,
-      error: error.response?.data || error,
+      error: {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      }
     });
   }
 });
