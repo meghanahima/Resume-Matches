@@ -577,7 +577,7 @@ const FindJobs = ({ showToast }) => {
       if (response.ok) {
         const data = await response.json();
         // Limit to maximum 6 resumes
-        setSavedResumes(data.resumes?.slice(0, 6) || []);
+        setSavedResumes(data.resumes || []);
       } else {
         showToast("Failed to load resumes", "error");
       }
