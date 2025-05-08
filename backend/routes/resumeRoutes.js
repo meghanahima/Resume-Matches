@@ -37,8 +37,7 @@ Return the response in the following **valid JSON format**:
       "email": string | null,          // Extract email  
       "phone": string | null,          // Extract phone number  
       "location": string | null,       // Extract city or full address if available  
-      "linkedin": string | null,       // Extract LinkedIn profile link  
-      "portfolio": string | null       // Extract GitHub or portfolio link  
+      "linkedin": string | null,       // Extract LinkedIn profile link 
     },
     "summary": string | null,           // Extract a concise professional summary  
     "skills": [                          // Extract all unique skills  
@@ -56,22 +55,11 @@ Return the response in the following **valid JSON format**:
     "employmentHistory": [               // Extract most **relevant** jobs (max 3)  
       {
         "jobTitle": string | null,  
-        "company": string | null,  
-        "city": string | null,  
+        "company": string | null,
         "startDate": string | null,     // Format: MM/YYYY or YYYY  
-        "endDate": string | null,       // "Present" if ongoing  
-        "description": string | null,  
-        "presentWorking": boolean | null // True if currently employed  
-      }
-    ],
-    "internships": [                     // Extract relevant internships (max 2)  
-      {
-        "jobTitle": string | null,  
-        "employer": string | null,  
-        "startDate": string | null,  
-        "endDate": string | null,  
-        "city": string | null,  
-        "description": string | null  
+        "endDate": string | null,       // "Present" if ongoing
+        "presentWorking": boolean | null // True if currently employed    
+        "description": string | null 
       }
     ],
     "projects": [                        // Extract key projects (max 3)  
@@ -88,28 +76,12 @@ Return the response in the following **valid JSON format**:
         "institution": string | null,  
         "year": string | null  
       }
-    ],
-    "courses": [                          // Extract key courses (if available)  
-      {
-        "course": string | null,  
-        "institution": string | null,  
-        "startDate": string | null,  
-        "endDate": string | null  
-      }
-    ],
-    "achievements": [                     // Extract top achievements (max 3)  
-      {
-        "title": string | null,  
-        "date": string | null,  
-        "description": string | null,  
-        "issuer": string | null  
-      }
     ]
   },
   "analysis": {                           // Provide insights on the candidate  
     "strengths": string[],                // Max **3 key strengths**  
     "weaknesses": string[],               // Max **3 areas for improvement**  
-    "suggestions": string[]               // Max **5 actionable career suggestions**  
+    "suggestions": string[]               // Max **3 actionable career suggestions**  
   },
   "ATSScore": number | null               // Optional: Include ATS score
 }
@@ -129,7 +101,7 @@ ${extractedContent}
 - Limit analysis to a **maximum of**:  
   - **3 strengths** – Highlight key professional advantages.  
   - **3 weaknesses** – Identify areas for development.  
-  - **5 career suggestions** – Offer specific recommendations.  
+  - **3 career suggestions** – Offer specific recommendations.  
 - Make feedback **actionable** and **tailored to the resume content**.  
 
 ### **ATS Scoring Guidelines:**
