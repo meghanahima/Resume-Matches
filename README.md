@@ -10,16 +10,16 @@ An intelligent platform that matches resumes to job descriptions using Generativ
 
 ## ✨ Features
 
-### Resume Parsing
+### 📂 Resume Parsing
 Leverages **Generative AI** to extract structured data (skills, experience, education) from resumes
 
-### Job Matching & Scoring
-- Uses a combination of **SBERT** and **ML models** to assess: Skill alignment, Experience relevance, Semantic similarity  
-- Assigns a **match score** to each job and displays ranked results
+### 📊 Job Matching & Scoring
+Uses a combination of **SBERT** and **ML models** to assess and assign a **match score** to each job and displays ranked results
 
-### Activity Tracking
-Interactive dashboard to: View saved jobs and resumes
+### 📈 Activity Tracking
+Interactive dashboard to view saved jobs and resumes
 
+---
 
 ## ⚙️ Tech Stack
 
