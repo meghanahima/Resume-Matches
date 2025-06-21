@@ -1,9 +1,35 @@
-# Resume-Matches
-Attributes of the ML model:
-1)resume_text, 
-2)job_description,
-3) job_role,
-4) job_skills, 
-5)education_match(0 or 1)(if not specified in the job description - the default one should be 1 itself), 
-6)skills_match(skills of resume matched to job/total number of skills in job)percentage of skills matched - to be of atmost upto 2 decimals), 
-7)experience_match(give score between 0 and 1 - if the experience not mentioned or 0 experience mentioned or job role experience matched with the resume experience in that role then give score of 1 or like if there is 3 - 7 years in the job_description and then based on the user experience level, give score between 0 to 1)
+# 📄 Resume Matches — AI-Powered Resume-to-Job Matching System
+
+An intelligent platform that matches resumes to job descriptions using Generative AI and ML-based similarity models. It provides ranked job suggestions, detailed scoring, and an activity dashboard for tracking resume interactions — streamlining both job search and recruitment workflows.
+
+---
+
+## 🎥 Demo
+
+![Project Demo](demo.gif)
+
+---
+
+## ✨ Features
+
+### 📂 Resume Parsing
+Leverages **Generative AI** to extract structured data (skills, experience, education) from resumes
+
+### 📊 Job Matching & Scoring
+- Uses a combination of **SBERT** and **ML models** to assess: Skill alignment, Experience relevance, Semantic similarity  
+- Assigns a **match score** to each job and displays ranked results
+
+### 📈 Activity Tracking
+Interactive dashboard to: View saved jobs and resumes
+
+---
+
+## ⚙️ Tech Stack
+
+- **Generative AI** for context-aware resume understanding
+- **SBERT + cosine similarity** for semantic job matching
+- **Python backend** with **MongoDB** for data storage
+- **Redis** for fast match computation and caching
+- **Azure S3** for storing resume files securely
+
+---
